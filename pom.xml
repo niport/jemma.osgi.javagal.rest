@@ -41,7 +41,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
 		<!-- Internal dependencies version properties -->
-		<org.energy-home.jemma.osgi.javagal.version>2.0.9</org.energy-home.jemma.osgi.javagal.version>
+		<org.energy-home.jemma.osgi.javagal.version>2.0.10</org.energy-home.jemma.osgi.javagal.version>
 		
 		<!-- External dependencies version properties -->
 		<com.googlecode.jaxb-namespaceprefixmapper-interfaces>2.2.4</com.googlecode.jaxb-namespaceprefixmapper-interfaces>
