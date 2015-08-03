@@ -41,14 +41,15 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@code GatewayEventListenerExtended} for the Rest server.
  * 
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
-public class RestClientManagerAndListener implements
-		GatewayEventListenerExtended {
+public class RestClientManagerAndListener implements GatewayEventListenerExtended {
 	private ExecutorService executor = null;
 	private String bindingDestination;
 	private String gatewayStopDestination;
@@ -68,16 +69,15 @@ public class RestClientManagerAndListener implements
 	private String interPANCommandDestination;
 	private String frequencyAgilityResultDestination;
 	private final Context context;
-	private static final Logger LOG = LoggerFactory.getLogger( RestClientManagerAndListener.class );
+	private static final Logger LOG = LoggerFactory.getLogger(RestClientManagerAndListener.class);
 	private PropertiesManager _PropertiesManager;
 	private ClientResources clientResource;
 
-	public RestClientManagerAndListener(PropertiesManager ___PropertiesManager,
-			ClientResources _clientResorce) {
+	public RestClientManagerAndListener(PropertiesManager ___PropertiesManager, ClientResources _clientResorce) {
 		_PropertiesManager = ___PropertiesManager;
 		this.clientResource = _clientResorce;
-		this.context =  new Context();
-		context.getParameters().add("socketTimeout", ((Integer)(_PropertiesManager.getHttpOptTimeout()*1000)).toString());
+		this.context = new Context();
+		context.getParameters().add("socketTimeout", ((Integer) (_PropertiesManager.getHttpOptTimeout() * 1000)).toString());
 		executor = Executors.newFixedThreadPool(_PropertiesManager.getNumberOfThreadForAnyPool(), new ThreadFactory() {
 
 			@Override
@@ -96,15 +96,13 @@ public class RestClientManagerAndListener implements
 
 	synchronized public void gatewayStartResult(final Status status) {
 
-		if ((startGatewayDestination != null)
-				&& !startGatewayDestination.equals("")) {
+		if ((startGatewayDestination != null) && !startGatewayDestination.equals("")) {
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + startGatewayDestination);
-						ClientResource resource = new ClientResource(context,
-								startGatewayDestination);
+							LOG.debug("Connecting to:" + startGatewayDestination);
+						ClientResource resource = new ClientResource(context, startGatewayDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -113,14 +111,14 @@ public class RestClientManagerAndListener implements
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.debug("Marshaled:" + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
-						
+
 						resource.release();
 						resource = null;
 						clientResource.resetCounter();
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on gatewayStartResult", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -132,16 +130,14 @@ public class RestClientManagerAndListener implements
 
 	public void nodeDiscovered(final Status status, final WSNNode node) {
 
-		if ((nodeDiscoveredDestination != null)
-				&& !nodeDiscoveredDestination.equals("")) {
+		if ((nodeDiscoveredDestination != null) && !nodeDiscoveredDestination.equals("")) {
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + nodeDiscoveredDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								nodeDiscoveredDestination);
+							LOG.debug("Connecting to:" + nodeDiscoveredDestination);
+
+						ClientResource resource = new ClientResource(context, nodeDiscoveredDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -149,7 +145,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -157,7 +153,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -168,17 +164,15 @@ public class RestClientManagerAndListener implements
 
 	public void nodeRemoved(final Status status, final WSNNode node) {
 
-		if ((nodeRemovedDestination != null)
-				&& !nodeRemovedDestination.equals("")) {
+		if ((nodeRemovedDestination != null) && !nodeRemovedDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + nodeRemovedDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								nodeRemovedDestination);
+							LOG.debug("Connecting to:" + nodeRemovedDestination);
+
+						ClientResource resource = new ClientResource(context, nodeRemovedDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -186,7 +180,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -194,7 +188,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -203,20 +197,17 @@ public class RestClientManagerAndListener implements
 
 	}
 
-	public void servicesDiscovered(final Status status,
-			final NodeServices services) {
+	public void servicesDiscovered(final Status status, final NodeServices services) {
 
-		if ((nodeServicesDestination != null)
-				&& !nodeServicesDestination.equals("")) {
+		if ((nodeServicesDestination != null) && !nodeServicesDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + nodeServicesDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								nodeServicesDestination);
+							LOG.debug("Connecting to:" + nodeServicesDestination);
+
+						ClientResource resource = new ClientResource(context, nodeServicesDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -224,7 +215,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -232,7 +223,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -241,20 +232,17 @@ public class RestClientManagerAndListener implements
 
 	}
 
-	public void serviceDescriptorRetrieved(final Status status,
-			final ServiceDescriptor service) {
+	public void serviceDescriptorRetrieved(final Status status, final ServiceDescriptor service) {
 
-		if ((serviceDescriptorDestination != null)
-				&& !serviceDescriptorDestination.equals("")) {
+		if ((serviceDescriptorDestination != null) && !serviceDescriptorDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + serviceDescriptorDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								serviceDescriptorDestination);
+							LOG.debug("Connecting to:" + serviceDescriptorDestination);
+
+						ClientResource resource = new ClientResource(context, serviceDescriptorDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -262,7 +250,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -270,7 +258,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -287,17 +275,16 @@ public class RestClientManagerAndListener implements
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + resetDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								resetDestination);
+							LOG.debug("Connecting to:" + resetDestination);
+
+						ClientResource resource = new ClientResource(context, resetDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -305,7 +292,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -321,16 +308,15 @@ public class RestClientManagerAndListener implements
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + bindingDestination);
-						ClientResource resource = new ClientResource(context,
-								bindingDestination);
+							LOG.debug("Connecting to:" + bindingDestination);
+						ClientResource resource = new ClientResource(context, bindingDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -338,7 +324,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -356,17 +342,16 @@ public class RestClientManagerAndListener implements
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + unbindingDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								unbindingDestination);
+							LOG.debug("Connecting to:" + unbindingDestination);
+
+						ClientResource resource = new ClientResource(context, unbindingDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -374,7 +359,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -383,20 +368,17 @@ public class RestClientManagerAndListener implements
 
 	}
 
-	public void nodeBindingsRetrieved(final Status status,
-			final BindingList bindings) {
+	public void nodeBindingsRetrieved(final Status status, final BindingList bindings) {
 
-		if ((nodeBindingDestination != null)
-				&& !nodeBindingDestination.equals("")) {
+		if ((nodeBindingDestination != null) && !nodeBindingDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + nodeBindingDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								nodeBindingDestination);
+							LOG.debug("Connecting to:" + nodeBindingDestination);
+
+						ClientResource resource = new ClientResource(context, nodeBindingDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -404,7 +386,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -412,7 +394,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -423,24 +405,22 @@ public class RestClientManagerAndListener implements
 
 	public void leaveResult(final Status status) {
 
-		if ((leaveResultDestination != null)
-				&& !leaveResultDestination.equals("")) {
+		if ((leaveResultDestination != null) && !leaveResultDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + leaveResultDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								leaveResultDestination);
+							LOG.debug("Connecting to:" + leaveResultDestination);
+
+						ClientResource resource = new ClientResource(context, leaveResultDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -448,7 +428,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -460,24 +440,22 @@ public class RestClientManagerAndListener implements
 
 	public void permitJoinResult(final Status status) {
 
-		if ((permitJoinDestination != null)
-				&& !permitJoinDestination.equals("")) {
+		if ((permitJoinDestination != null) && !permitJoinDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + permitJoinDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								permitJoinDestination);
+							LOG.debug("Connecting to:" + permitJoinDestination);
+
+						ClientResource resource = new ClientResource(context, permitJoinDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -485,7 +463,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -495,20 +473,17 @@ public class RestClientManagerAndListener implements
 
 	}
 
-	public void nodeDescriptorRetrievedExtended(final Status status,
-			final NodeDescriptor node, final Address addressOfInteres) {
+	public void nodeDescriptorRetrievedExtended(final Status status, final NodeDescriptor node, final Address addressOfInteres) {
 
-		if ((nodeDescriptorDestination != null)
-				&& !nodeDescriptorDestination.equals("")) {
+		if ((nodeDescriptorDestination != null) && !nodeDescriptorDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + nodeDescriptorDestination);
-						
-						ClientResource resource = new ClientResource(context,
-								nodeDescriptorDestination);
+							LOG.debug("Connecting to:" + nodeDescriptorDestination);
+
+						ClientResource resource = new ClientResource(context, nodeDescriptorDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -519,7 +494,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -527,7 +502,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -537,20 +512,17 @@ public class RestClientManagerAndListener implements
 	}
 
 	@Deprecated
-	public void nodeDescriptorRetrieved(final Status status,
-			final NodeDescriptor node) {
+	public void nodeDescriptorRetrieved(final Status status, final NodeDescriptor node) {
 
-		if ((nodeDescriptorDestination != null)
-				&& !nodeDescriptorDestination.equals("")) {
+		if ((nodeDescriptorDestination != null) && !nodeDescriptorDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + nodeDescriptorDestination);
-					
-						ClientResource resource = new ClientResource(context,
-								nodeDescriptorDestination);
+							LOG.debug("Connecting to:" + nodeDescriptorDestination);
+
+						ClientResource resource = new ClientResource(context, nodeDescriptorDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -558,7 +530,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -566,7 +538,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -577,24 +549,22 @@ public class RestClientManagerAndListener implements
 
 	public void gatewayStopResult(final Status status) {
 
-		if ((gatewayStopDestination != null)
-				&& !gatewayStopDestination.equals("")) {
+		if ((gatewayStopDestination != null) && !gatewayStopDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + gatewayStopDestination);
-					
-						ClientResource resource = new ClientResource(context,
-								gatewayStopDestination);
+							LOG.debug("Connecting to:" + gatewayStopDestination);
+
+						ClientResource resource = new ClientResource(context, gatewayStopDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -602,7 +572,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -611,20 +581,17 @@ public class RestClientManagerAndListener implements
 
 	}
 
-	public void leaveResultExtended(final Status status,
-			final Address addressOfInteres) {
+	public void leaveResultExtended(final Status status, final Address addressOfInteres) {
 
-		if ((leaveResultDestination != null)
-				&& !leaveResultDestination.equals("")) {
+		if ((leaveResultDestination != null) && !leaveResultDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + leaveResultDestination);
-	
-						ClientResource resource = new ClientResource(context,
-								leaveResultDestination);
+							LOG.debug("Connecting to:" + leaveResultDestination);
+
+						ClientResource resource = new ClientResource(context, leaveResultDestination);
 						Info info = new Info();
 						info.setStatus(status);
 						Info.Detail detail = new Info.Detail();
@@ -634,7 +601,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -642,7 +609,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -654,22 +621,20 @@ public class RestClientManagerAndListener implements
 
 	public void notifyZDPCommand(final ZDPMessage message) {
 
-		if ((zdpCommandDestination != null)
-				&& !zdpCommandDestination.equals("")) {
+		if ((zdpCommandDestination != null) && !zdpCommandDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + zdpCommandDestination);
-	
-						ClientResource resource = new ClientResource(context,
-								zdpCommandDestination);
+							LOG.debug("Connecting to:" + zdpCommandDestination);
+
+						ClientResource resource = new ClientResource(context, zdpCommandDestination);
 						Info.Detail detail = new Info.Detail();
 						detail.setZDPMessage(message);
 						String _xml = Util.marshal(detail);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -677,7 +642,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -686,23 +651,18 @@ public class RestClientManagerAndListener implements
 		}
 
 	}
-	
-	
-	
-	
+
 	public void notifyInterPANCommand(final InterPANMessageEvent message) {
 
-		if ((interPANCommandDestination  != null)
-				&& !interPANCommandDestination.equals("")) {
+		if ((interPANCommandDestination != null) && !interPANCommandDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.info("Connecting to:"  + interPANCommandDestination);
-	
-						ClientResource resource = new ClientResource(context,
-								interPANCommandDestination);
+							LOG.info("Connecting to:" + interPANCommandDestination);
+
+						ClientResource resource = new ClientResource(context, interPANCommandDestination);
 						Info.Detail detail = new Info.Detail();
 						detail.setInterPANMessageEvent(message);
 						String _xml = Util.marshal(detail);
@@ -714,8 +674,8 @@ public class RestClientManagerAndListener implements
 						clientResource.resetCounter();
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.error(e.getMessage(),e);
-	
+							LOG.error(e.getMessage(), e);
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -724,26 +684,23 @@ public class RestClientManagerAndListener implements
 		}
 
 	}
-	
 
 	public void notifyZCLCommand(final ZCLMessage message) {
 
-		if ((zclCommandDestination != null)
-				&& !zclCommandDestination.equals("")) {
+		if ((zclCommandDestination != null) && !zclCommandDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + zclCommandDestination);
-	
-						ClientResource resource = new ClientResource(context,
-								zclCommandDestination);
+							LOG.debug("Connecting to:" + zclCommandDestination);
+
+						ClientResource resource = new ClientResource(context, zclCommandDestination);
 						Info.Detail detail = new Info.Detail();
 						detail.setZCLMessage(message);
 						String _xml = Util.marshal(detail);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -751,7 +708,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -762,16 +719,14 @@ public class RestClientManagerAndListener implements
 
 	public void FrequencyAgilityResponse(final Status _st) {
 
-		if ((frequencyAgilityResultDestination != null)
-				&& !frequencyAgilityResultDestination.equals("")) {
+		if ((frequencyAgilityResultDestination != null) && !frequencyAgilityResultDestination.equals("")) {
 
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:"  + frequencyAgilityResultDestination);
-						ClientResource resource = new ClientResource(context,
-								frequencyAgilityResultDestination);
+							LOG.debug("Connecting to:" + frequencyAgilityResultDestination);
+						ClientResource resource = new ClientResource(context, frequencyAgilityResultDestination);
 						Info info = new Info();
 						info.setStatus(_st);
 						Info.Detail detail = new Info.Detail();
@@ -779,7 +734,7 @@ public class RestClientManagerAndListener implements
 						info.setDetail(detail);
 						String _xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: "+_xml);
+							LOG.debug("Marshaled: " + _xml);
 						resource.post(_xml, MediaType.TEXT_XML);
 						resource.release();
 						resource = null;
@@ -787,7 +742,7 @@ public class RestClientManagerAndListener implements
 					} catch (Exception e) {
 						if (_PropertiesManager.getDebugEnabled())
 							LOG.error("Exception on ??", e);
-	
+
 						clientResource.addToCounterException();
 					}
 				}
@@ -864,8 +819,7 @@ public class RestClientManagerAndListener implements
 		return serviceDescriptorDestination;
 	}
 
-	public void setServiceDescriptorDestination(
-			String serviceDescriptorDestination) {
+	public void setServiceDescriptorDestination(String serviceDescriptorDestination) {
 		this.serviceDescriptorDestination = serviceDescriptorDestination;
 	}
 
@@ -889,16 +843,14 @@ public class RestClientManagerAndListener implements
 		return frequencyAgilityResultDestination;
 	}
 
-	public void setFrequencyAgilityResultDestination(
-			String _frequencyAgilityResultDestination) {
+	public void setFrequencyAgilityResultDestination(String _frequencyAgilityResultDestination) {
 		this.frequencyAgilityResultDestination = _frequencyAgilityResultDestination;
 	}
 
 	public String getZdpCommandDestination() {
 		return zdpCommandDestination;
 	}
-	
-	
+
 	public String getinterPANCommandDestination() {
 		return interPANCommandDestination;
 	}
@@ -906,7 +858,7 @@ public class RestClientManagerAndListener implements
 	public void setZdpCommandDestination(String zdpCommandDestination) {
 		this.zdpCommandDestination = zdpCommandDestination;
 	}
-	
+
 	public void setInterPANCommandDestination(String interPANCommandDestination) {
 		this.interPANCommandDestination = interPANCommandDestination;
 	}

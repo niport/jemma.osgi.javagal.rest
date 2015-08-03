@@ -34,9 +34,10 @@ import org.slf4j.LoggerFactory;
  *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-@Deprecated //FIXME to be removed: see same class in javagal bundle
+@Deprecated
+// FIXME to be removed: see same class in javagal bundle
 public class PropertiesManager {
-	private static final Logger LOG = LoggerFactory.getLogger( PropertiesManager.class );
+	private static final Logger LOG = LoggerFactory.getLogger(PropertiesManager.class);
 	public Properties props;
 
 	public PropertiesManager(URL _url) {
@@ -63,7 +64,7 @@ public class PropertiesManager {
 	}
 
 	/**
-	 * Get the debug messages enabled status 
+	 * Get the debug messages enabled status
 	 **/
 	public boolean getDebugEnabled() {
 		String _value = props.getProperty("debugEnabled");
@@ -120,6 +121,7 @@ public class PropertiesManager {
 		return Integer.parseInt(_value);
 
 	}
+
 	public void setDebugEnabled(Boolean _debug) {
 		props.setProperty("debugEnabled", _debug.toString());
 

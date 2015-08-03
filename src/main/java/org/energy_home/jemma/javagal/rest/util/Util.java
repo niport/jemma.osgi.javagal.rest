@@ -53,7 +53,7 @@ public class Util {
 	 */
 	public static final String UTF8_CHAR_ENCODING = "UTF-8";
 	private static Random r;
-	private static final Logger LOG = LoggerFactory.getLogger( Util.class );
+	private static final Logger LOG = LoggerFactory.getLogger(Util.class);
 
 	static {
 		unsigned8MaxValue = Long.decode("0xff");
@@ -74,8 +74,7 @@ public class Util {
 	 *             if an error occurs.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	synchronized public static <T> T unmarshal(String content, Class<T> clasz)
-			throws Exception {
+	synchronized public static <T> T unmarshal(String content, Class<T> clasz) throws Exception {
 		JAXBContext jc = JAXBContext.newInstance(clasz);
 		Unmarshaller u = jc.createUnmarshaller();
 		Object o = null;
@@ -83,10 +82,8 @@ public class Util {
 		_res = content.getBytes("UTF-8");
 		String __str = "";
 		__str = new String(_res, "UTF-8");
-		StringBuffer xmlStr = new StringBuffer(
-				(!__str.startsWith("<") ? __str.substring(3) : __str));
-		o = u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())),
-				clasz);
+		StringBuffer xmlStr = new StringBuffer((!__str.startsWith("<") ? __str.substring(3) : __str));
+		o = u.unmarshal(new StreamSource(new StringReader(xmlStr.toString())), clasz);
 		return (T) ((JAXBElement) o).getValue();
 	}
 
@@ -105,19 +102,15 @@ public class Util {
 		try {
 			JAXBContext jc = JAXBContext.newInstance(o.getClass());
 			Marshaller m = jc.createMarshaller();
-			QName _qname = new QName("http://www.zigbee.org/GWGRESTSchema", o
-					.getClass().getSimpleName());
-			JAXBElement<T> je = new JAXBElement<T>(_qname,
-					(Class<T>) o.getClass(), ((T) o));
+			QName _qname = new QName("http://www.zigbee.org/GWGRESTSchema", o.getClass().getSimpleName());
+			JAXBElement<T> je = new JAXBElement<T>(_qname, (Class<T>) o.getClass(), ((T) o));
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			m.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",
-					new NamespacePrefixMapperImpl());
-			m.setProperty("com.sun.xml.internal.bind.xmlDeclaration",
-					Boolean.TRUE);
+			m.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl());
+			m.setProperty("com.sun.xml.internal.bind.xmlDeclaration", Boolean.TRUE);
 			m.marshal(je, stringWriter);
 			String _tores = stringWriter.toString();
-			
+
 			return _tores;
 		} catch (JAXBException e) {
 			LOG.error("Exception on marshal : ", e);
@@ -181,8 +174,7 @@ public class Util {
 	 */
 	public static byte[] getRequestIdentifier() {
 
-		byte[] rid = { (byte) r.nextInt(), (byte) r.nextInt(),
-				(byte) r.nextInt(), (byte) r.nextInt() };
+		byte[] rid = { (byte) r.nextInt(), (byte) r.nextInt(), (byte) r.nextInt(), (byte) r.nextInt() };
 		return rid;
 	}
 

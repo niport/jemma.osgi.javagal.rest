@@ -34,10 +34,11 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
- *  Resource file used to manage the API POST:permitJoinSync, permitJoin
- *  
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API POST:permitJoinSync, permitJoin
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class PermitJoinResource extends ServerResource {
 
@@ -53,15 +54,13 @@ public class PermitJoinResource extends ServerResource {
 
 		Long timeout = -1l;
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam == null) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT
-					+ "' parameter missing.");
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
@@ -78,15 +77,11 @@ public class PermitJoinResource extends ServerResource {
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: mandatory '"
-							+ Resources.URI_PARAM_TIMEOUT
-							+ "' parameter's value invalid. You provided: "
-							+ timeoutString);
+					_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
@@ -95,22 +90,17 @@ public class PermitJoinResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '"
-						+ Resources.URI_PARAM_TIMEOUT
-						+ "' parameter's value invalid. You provided: "
-						+ timeoutString);
+				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 		}
 
-		aoiString = (String) getRequest().getAttributes().get(
-				Resources.PARAMETER_AOI);
+		aoiString = (String) getRequest().getAttributes().get(Resources.PARAMETER_AOI);
 
 		if (aoiString == null) {
 
@@ -137,25 +127,21 @@ public class PermitJoinResource extends ServerResource {
 			address.setNetworkAddress(shortAddress);
 		}
 
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 		JoiningInfo joiningInfo;
 		try {
 			joiningInfo = Util.unmarshal(body, JoiningInfo.class);
 
 			if (urilistenerParam == null) {
-				proxyGalInterface = getRestManager().getClientObjectKey(-1,
-						getClientInfo().getAddress()).getGatewayInterface();
+				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 				// Sync call because urilistener not present.
-				Status status = proxyGalInterface.permitJoinSync(timeout,
-						address, joiningInfo.getPermitDuration());
+				Status status = proxyGalInterface.permitJoinSync(timeout, address, joiningInfo.getPermitDuration());
 				Info info = new Info();
 				info.setStatus(status);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			} else {
 				// Async call. We know here that urilistenerParam is not null...
@@ -163,15 +149,11 @@ public class PermitJoinResource extends ServerResource {
 				// Process async. If urilistener equals "", don't send the
 				// result but wait that the IPHA polls for it using the request
 				// identifier.
-				ClientResources rcmal = getRestManager().getClientObjectKey(
-						Util.getPortFromUriListener(urilistener),
-						getClientInfo().getAddress());
+				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 				proxyGalInterface = rcmal.getGatewayInterface();
 
-				rcmal.getClientEventListener().setPermitJoinDestination(
-						urilistener);
-				proxyGalInterface.permitJoin(timeout, address,
-						joiningInfo.getPermitDuration());
+				rcmal.getClientEventListener().setPermitJoinDestination(urilistener);
+				proxyGalInterface.permitJoin(timeout, address, joiningInfo.getPermitDuration());
 				Info.Detail detail = new Info.Detail();
 				Info infoToReturn = new Info();
 				Status status = new Status();
@@ -179,8 +161,7 @@ public class PermitJoinResource extends ServerResource {
 				infoToReturn.setStatus(status);
 				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 				return;
 			}
 		} catch (Exception e1) {

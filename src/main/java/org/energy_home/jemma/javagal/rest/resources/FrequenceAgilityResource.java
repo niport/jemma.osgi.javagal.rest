@@ -31,7 +31,8 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- * Resource file used to manage the API GET:frequencyAgilitySync, frequencyAgility
+ * Resource file used to manage the API GET:frequencyAgilitySync,
+ * frequencyAgility
  * 
  * @author 
  *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
@@ -52,19 +53,16 @@ public class FrequenceAgilityResource extends ServerResource {
 		Long scanChannel = 0l;
 		Long scanDuration = (long) 0xFE;
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam == null) {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT
-					+ "' parameter missing.");
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info),
-					MediaType.APPLICATION_XML);
+			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 			return;
 
 		} else {
@@ -76,15 +74,11 @@ public class FrequenceAgilityResource extends ServerResource {
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: mandatory '"
-							+ Resources.URI_PARAM_TIMEOUT
-							+ "' parameter's value invalid. You provided: "
-							+ timeoutString);
+					_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
@@ -97,15 +91,13 @@ public class FrequenceAgilityResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 		}
 
-		Parameter scanChannelParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_SCANCHANNEL);
+		Parameter scanChannelParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_SCANCHANNEL);
 		scanChannelString = scanChannelParam.getValue().trim();
 		try {
 			scanChannel = Long.decode(scanChannelString);
@@ -114,14 +106,11 @@ public class FrequenceAgilityResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: '" + Resources.URI_SCANCHANNEL
-						+ "' parameter's value invalid. You provided: "
-						+ scanChannelString);
+				_st.setMessage("Error: '" + Resources.URI_SCANCHANNEL + "' parameter's value invalid. You provided: " + scanChannelString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			}
 		} catch (NumberFormatException nfe) {
@@ -129,20 +118,16 @@ public class FrequenceAgilityResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: '" + Resources.URI_SCANCHANNEL
-					+ "' parameter's value invalid. You provided: "
-					+ scanChannelString);
+			_st.setMessage("Error: '" + Resources.URI_SCANCHANNEL + "' parameter's value invalid. You provided: " + scanChannelString);
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info),
-					MediaType.APPLICATION_XML);
+			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 			return;
 
 		}
 
-		Parameter scanDurationParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_SCANDURATION);
+		Parameter scanDurationParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_SCANDURATION);
 		if (scanDurationParam != null) {
 			scanDurationString = scanDurationParam.getValue().trim();
 			try {
@@ -152,14 +137,11 @@ public class FrequenceAgilityResource extends ServerResource {
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: '" + Resources.URI_SCANDURATION
-							+ "' parameter's value invalid. You provided: "
-							+ scanDurationString);
+					_st.setMessage("Error: '" + Resources.URI_SCANDURATION + "' parameter's value invalid. You provided: " + scanDurationString);
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
@@ -168,34 +150,26 @@ public class FrequenceAgilityResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: '" + Resources.URI_SCANDURATION
-						+ "' parameter's value invalid. You provided: "
-						+ scanDurationString);
+				_st.setMessage("Error: '" + Resources.URI_SCANDURATION + "' parameter's value invalid. You provided: " + scanDurationString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 		}
 
 		try {
-			Parameter urilistenerParam = getRequest().getResourceRef()
-					.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+			Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 			if (urilistenerParam != null) {
 				urilistener = urilistenerParam.getValue();
-				ClientResources rcmal = getRestManager().getClientObjectKey(
-						Util.getPortFromUriListener(urilistener),
-						getClientInfo().getAddress());
+				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 				proxyGalInterface = rcmal.getGatewayInterface();
 
-				rcmal.getClientEventListener()
-						.setFrequencyAgilityResultDestination(urilistener);
-				proxyGalInterface.frequencyAgility(timeout,
-						scanChannel.shortValue(), scanDuration.shortValue());
+				rcmal.getClientEventListener().setFrequencyAgilityResultDestination(urilistener);
+				proxyGalInterface.frequencyAgility(timeout, scanChannel.shortValue(), scanDuration.shortValue());
 				Info.Detail detail = new Info.Detail();
 				Info infoToReturn = new Info();
 				Status status = new Status();
@@ -203,17 +177,13 @@ public class FrequenceAgilityResource extends ServerResource {
 				infoToReturn.setStatus(status);
 				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 				return;
 
 			} else {
 				// Sync
-				proxyGalInterface = getRestManager().getClientObjectKey(-1,
-						getClientInfo().getAddress()).getGatewayInterface();
-				Status _result = proxyGalInterface.frequencyAgilitySync(
-						timeout, scanChannel.shortValue(),
-						scanDuration.shortValue());
+				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+				Status _result = proxyGalInterface.frequencyAgilitySync(timeout, scanChannel.shortValue(), scanDuration.shortValue());
 				Info _st = new Info();
 				_st.setStatus(_result);
 				getResponse().setEntity(Util.marshal(_st), MediaType.TEXT_XML);
@@ -228,13 +198,11 @@ public class FrequenceAgilityResource extends ServerResource {
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info),
-					MediaType.APPLICATION_XML);
+			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 			return;
 		}
 	}
 
-	
 	/**
 	 * Gets the RestManager.
 	 * 

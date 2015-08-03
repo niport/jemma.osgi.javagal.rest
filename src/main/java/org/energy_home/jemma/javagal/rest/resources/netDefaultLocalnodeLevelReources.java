@@ -28,17 +28,17 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
-
 /**
  * Resource file used to manage the API GET:URL menu.
- *  
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class netDefaultLocalnodeLevelReources extends ServerResource {
 
 	@Get
-	public void represent()  {
+	public void represent() {
 		Detail _det = new Detail();
 		Info _info = new Info();
 		Status _st = new Status();
@@ -49,11 +49,8 @@ public class netDefaultLocalnodeLevelReources extends ServerResource {
 		_det.getValue().add(ResourcePathURIs.NODEDESCRIPTOR);
 		_det.getValue().add(ResourcePathURIs.FREQUENCY_AGILITY);
 		_info.setDetail(_det);
-		getResponse().setEntity(Util.marshal(_info),
-				MediaType.APPLICATION_XML);
+		getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
 		return;
-		
-		
-		
+
 	}
 }

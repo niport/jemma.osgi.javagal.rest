@@ -31,10 +31,12 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 /**
- * Resource file used to manage the API GET:getInfoBaseAttribute. PUT:setInfoBaseAttribute
- *  
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API GET:getInfoBaseAttribute.
+ * PUT:setInfoBaseAttribute
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class InformationBaseResource extends ServerResource {
 
@@ -56,7 +58,7 @@ public class InformationBaseResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} else {
 			try {
@@ -70,9 +72,8 @@ public class InformationBaseResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 			if (!Util.isUnsigned8(attrId)) {
@@ -80,14 +81,12 @@ public class InformationBaseResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory id parameter's value invalid (Unsigned8). You provided: "
-						+ attrId);
+				_st.setMessage("Error: mandatory id parameter's value invalid (Unsigned8). You provided: " + attrId);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 		}
@@ -95,14 +94,9 @@ public class InformationBaseResource extends ServerResource {
 		try {
 
 			short shortAttrId = attrId.shortValue();
-			proxyGalInterface = getRestManager().getClientObjectKey(-1,
-					getClientInfo().getAddress()).getGatewayInterface();
+			proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 			String attributeString = proxyGalInterface.getInfoBaseAttribute(shortAttrId);
-			
-			
-			
-			
-			
+
 			Detail _det = new Detail();
 			Info _info = new Info();
 			Status _st = new Status();
@@ -110,10 +104,9 @@ public class InformationBaseResource extends ServerResource {
 			_info.setStatus(_st);
 			_det.getValue().add(attributeString);
 			_info.setDetail(_det);
-			getResponse().setEntity(Util.marshal(_info),
-					MediaType.APPLICATION_XML);
+			getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
 			return;
-			
+
 		} catch (NullPointerException npe) {
 			Info info = new Info();
 			Status _st = new Status();
@@ -123,7 +116,7 @@ public class InformationBaseResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 		} catch (Exception e1) {
 			Info info = new Info();
 			Status _st = new Status();
@@ -133,7 +126,7 @@ public class InformationBaseResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 		}
 	}
 
@@ -152,7 +145,7 @@ public class InformationBaseResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} else {
 			try {
@@ -161,28 +154,24 @@ public class InformationBaseResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory callback id parameter incorrect (Unsigned8). You provided: "
-						+ attrString);
+				_st.setMessage("Error: mandatory callback id parameter incorrect (Unsigned8). You provided: " + attrString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 			if (!Util.isUnsigned8(attrId)) {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory id parameter's value invalid (Unsigned8). You provided: "
-						+ attrId);
+				_st.setMessage("Error: mandatory id parameter's value invalid (Unsigned8). You provided: " + attrId);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 		}
@@ -194,23 +183,20 @@ public class InformationBaseResource extends ServerResource {
 
 		try {
 			short shortAttrId = attrId.shortValue();
-			proxyGalInterface = getRestManager().getClientObjectKey(-1,
-					getClientInfo().getAddress()).getGatewayInterface();
-			
-			
+			proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+
 			proxyGalInterface.setInfoBaseAttribute(shortAttrId, value);
-			
+
 			Detail _det = new Detail();
 			Info _info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.SUCCESS);
 			_info.setStatus(_st);
-			
+
 			_info.setDetail(_det);
-			getResponse().setEntity(Util.marshal(_info),
-					MediaType.APPLICATION_XML);
+			getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
 			return;
-			
+
 		} catch (Exception e) {
 			Info info = new Info();
 			Status _st = new Status();
@@ -220,7 +206,7 @@ public class InformationBaseResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 	}

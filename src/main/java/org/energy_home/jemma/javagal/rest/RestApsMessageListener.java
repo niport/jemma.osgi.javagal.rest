@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RestApsMessageListener implements APSMessageListener {
 	private ExecutorService executor = null;
-	private static final Logger LOG = LoggerFactory.getLogger( RestApsMessageListener.class );
+	private static final Logger LOG = LoggerFactory.getLogger(RestApsMessageListener.class);
 	private Long CalbackIdentifier = -1L;
 	private Callback callback;
 	private String urilistener;
@@ -114,7 +114,7 @@ public class RestApsMessageListener implements APSMessageListener {
 						info.setEventCallbackIdentifier(CalbackIdentifier);
 						String xml = Util.marshal(info);
 						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled:" +xml);
+							LOG.debug("Marshaled:" + xml);
 						resource.post(xml, MediaType.APPLICATION_XML);
 						resource.release();
 						resource = null;
@@ -158,7 +158,5 @@ public class RestApsMessageListener implements APSMessageListener {
 		CalbackIdentifier = id;
 
 	}
-
-
 
 }

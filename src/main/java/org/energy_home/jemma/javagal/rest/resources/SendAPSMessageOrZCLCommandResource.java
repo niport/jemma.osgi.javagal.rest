@@ -36,12 +36,12 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
-
 /**
- *  Resource file used to manage the API POST:sendAPSMessage, sendZCLCommand
- *  
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API POST:sendAPSMessage, sendZCLCommand
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 
@@ -55,20 +55,18 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 		String urilistener = null;
 		Long timeout = -1l;
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam == null) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT
-					+ "' parameter missing.");
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} else {
 			timeoutString = timeoutParam.getValue().trim();
@@ -82,9 +80,8 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 			// if (timeout < 0 || timeout > 0xffffffff) {
@@ -93,22 +90,17 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '"
-						+ Resources.URI_PARAM_TIMEOUT
-						+ "' parameter's value invalid. You provided: "
-						+ timeoutString);
+				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 		}
 		short service;
-		String serviceString = (String) getRequest().getAttributes().get(
-				Resources.PARAMETER_SERVICE);
+		String serviceString = (String) getRequest().getAttributes().get(Resources.PARAMETER_SERVICE);
 		try {
 			service = Short.parseShort(serviceString, 16);
 		} catch (NullPointerException npe) {
@@ -116,28 +108,24 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_SERVICE
-					+ "' parameter's value invalid. You provided: "
-					+ serviceString);
+			_st.setMessage("Error: mandatory '" + Resources.URI_SERVICE + "' parameter's value invalid. You provided: " + serviceString);
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} catch (NumberFormatException nfe) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_SERVICE
-					+ "' parameter's value invalid. You provided: "
-					+ serviceString);
+			_st.setMessage("Error: mandatory '" + Resources.URI_SERVICE + "' parameter's value invalid. You provided: " + serviceString);
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 
@@ -146,42 +134,33 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_SERVICE
-					+ "' parameter's value invalid. You provided: "
-					+ serviceString);
+			_st.setMessage("Error: mandatory '" + Resources.URI_SERVICE + "' parameter's value invalid. You provided: " + serviceString);
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 		// Actual Gal call
-		
+
 		APSMessage apsMessage = null;
 		ZCLCommand zclCommand = null;
-		
 
 		try {
 			apsMessage = Util.unmarshal(body, APSMessage.class);
 		} catch (Exception je) {
-			
+
 		}
-		
-		
+
 		try {
 			zclCommand = Util.unmarshal(body, ZCLCommand.class);
 		} catch (Exception je) {
-			
+
 		}
-		
-		
-		
-		
 
 		if (apsMessage != null) {
 			// It's a Send APSMessage invocation
@@ -193,21 +172,19 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 					int txTime = Util.currentTimeMillis();
 					proxyGalInterface.sendAPSMessage(apsMessage);
 					Info _info = new Info();
-					Status st=new Status();
-					st.setCode((short)GatewayConstants.SUCCESS);
+					Status st = new Status();
+					st.setCode((short) GatewayConstants.SUCCESS);
 					_info.setStatus(st);
 					Info.Detail detail = new Info.Detail();
 					APSMessageResult apsMessageResult = new APSMessageResult();
 					apsMessageResult.setConfirmStatus(0);
 					apsMessageResult.setTxTime(txTime);
 					detail.setAPSMessageResult(apsMessageResult);
-					
+
 					_info.setDetail(detail);
-						getResponse().setEntity(Util.marshal(_info),
-							MediaType.TEXT_XML);
-					
-					
-					return ;
+					getResponse().setEntity(Util.marshal(_info), MediaType.TEXT_XML);
+
+					return;
 				} else {
 					// Async call. We know here that urilistenerParam is not
 					// null...
@@ -228,9 +205,8 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 					infoToReturn.setStatus(status);
 					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn),
-							MediaType.TEXT_XML);
-					return ;
+					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+					return;
 				}
 			} catch (Exception e1) {
 				Info info = new Info();
@@ -240,17 +216,12 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 			}
-		} 
-		
-		
-		else if (zclCommand != null)
-		{
-			
-			
+		}
+
+		else if (zclCommand != null) {
 
 			// It's a Send ZCLCommand invocation
 			try {
@@ -260,7 +231,6 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 				if (urilistenerParam == null) {
 					// Only Asynch is admitted.
 
-					
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
@@ -268,11 +238,9 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
-					return ;
-					
-				
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+					return;
+
 				} else {
 					// Async call. We know here that urilistenerParam is not
 					// null...
@@ -290,9 +258,8 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 					Info info = new Info();
 					info.setStatus(new Status());
 					info.setRequestIdentifier(Util.getRequestIdentifier());
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
-					return ;
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+					return;
 				}
 			} catch (Exception e1) {
 				Info info = new Info();
@@ -302,15 +269,12 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 			}
 		}
-		
-		
-		else
-		{
+
+		else {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
@@ -318,13 +282,11 @@ public class SendAPSMessageOrZCLCommandResource extends ServerResource {
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info),
-					MediaType.APPLICATION_XML);
-			return ;
-			
+			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+			return;
+
 		}
-			
-			
+
 	}
 
 	/**

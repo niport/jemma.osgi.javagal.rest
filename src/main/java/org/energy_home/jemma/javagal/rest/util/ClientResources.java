@@ -31,8 +31,9 @@ import org.energy_home.jemma.zgd.GatewayInterface;
 /**
  * Resource's class for a Rest client.
  * 
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class ClientResources {
 	private RestManager restManager;
@@ -50,19 +51,17 @@ public class ClientResources {
 	 * @param _restManager
 	 *            the rest manager.
 	 */
-	public ClientResources(PropertiesManager _propertiesManager,
-			GatewayInterface _gatewayInterface, ClientKey _clientKey,
-			RestManager _restManager) {
+	public ClientResources(PropertiesManager _propertiesManager, GatewayInterface _gatewayInterface, ClientKey _clientKey, RestManager _restManager) {
 		this.gatewayInterface = _gatewayInterface;
 		this.propertiesManager = _propertiesManager;
 		this.restManager = _restManager;
 		this.clientKey = _clientKey;
 	}
 
-	private static final Logger LOG = LoggerFactory.getLogger( ClientResources.class );
+	private static final Logger LOG = LoggerFactory.getLogger(ClientResources.class);
 	private ConcurrentHashMap<Long, RestMessageListener> messageCallbacksEventListeners = new ConcurrentHashMap<Long, RestMessageListener>();
 	private ConcurrentHashMap<Long, RestApsMessageListener> messageApscallbacksEventListeners = new ConcurrentHashMap<Long, RestApsMessageListener>();
-	
+
 	private RestClientManagerAndListener clientEventListener = null;
 	private PropertiesManager propertiesManager = null;
 	private int counterException;
@@ -76,8 +75,7 @@ public class ClientResources {
 
 	public synchronized void addToCounterException() {
 		counterException = counterException + 1;
-		if (counterException > restManager.getPropertiesManager()
-				.getnumberOfConnectionFail()) {
+		if (counterException > restManager.getPropertiesManager().getnumberOfConnectionFail()) {
 			if (propertiesManager.getDebugEnabled())
 				LOG.debug("Deleting Client...");
 			try {
@@ -98,8 +96,7 @@ public class ClientResources {
 	 */
 	public void setGatewayEventListener() {
 		if (clientEventListener == null) {
-			clientEventListener = new RestClientManagerAndListener(
-					propertiesManager, this);
+			clientEventListener = new RestClientManagerAndListener(propertiesManager, this);
 
 			gatewayInterface.setGatewayEventListener(clientEventListener);
 			if (propertiesManager.getDebugEnabled())
@@ -137,21 +134,17 @@ public class ClientResources {
 	 * @param callbacksEventListeners
 	 *            the map of callbacks event listeners to set.
 	 */
-	public void setmessageCallbacksEventListeners(
-			ConcurrentHashMap<Long, RestMessageListener> callbacksEventListeners) {
+	public void setmessageCallbacksEventListeners(ConcurrentHashMap<Long, RestMessageListener> callbacksEventListeners) {
 		this.messageCallbacksEventListeners = callbacksEventListeners;
 	}
-	
-	
-	
+
 	/**
 	 * Sets the map of callbacks event listeners.
 	 * 
 	 * @param callbacksEventListeners
 	 *            the map of callbacks event listeners to set.
 	 */
-	public void setMessageApsCallbacksEventListeners(
-			ConcurrentHashMap<Long, RestApsMessageListener> callbacksEventListeners) {
+	public void setMessageApsCallbacksEventListeners(ConcurrentHashMap<Long, RestApsMessageListener> callbacksEventListeners) {
 		this.messageApscallbacksEventListeners = callbacksEventListeners;
 	}
 
@@ -170,8 +163,7 @@ public class ClientResources {
 	 * @param clientEventListener
 	 *            the client event listener to set.
 	 */
-	public synchronized void setClientEventListener(
-			RestClientManagerAndListener clientEventListener) {
+	public synchronized void setClientEventListener(RestClientManagerAndListener clientEventListener) {
 		this.clientEventListener = clientEventListener;
 	}
 
@@ -183,8 +175,7 @@ public class ClientResources {
 	public synchronized ConcurrentHashMap<Long, RestApsMessageListener> getApsCallbacksEventListeners() {
 		return messageApscallbacksEventListeners;
 	}
-	
-	
+
 	/**
 	 * Gets the map of callbacks event listeners.
 	 * 

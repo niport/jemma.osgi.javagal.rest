@@ -33,10 +33,11 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- *  Resource file used to manage the API GET:resetDongleSync, resetDongle
- *  
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API GET:resetDongleSync, resetDongle
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class ResetResource extends ServerResource {
 
@@ -50,13 +51,11 @@ public class ResetResource extends ServerResource {
 		Long timeout = -1l;
 		short warmStartValue = 0x00;
 
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 		if (urilistenerParam != null) {
 			urilistener = urilistenerParam.getValue().trim();
 		}
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam != null) {
 			timeoutString = timeoutParam.getValue().trim();
 			try {
@@ -69,8 +68,7 @@ public class ResetResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
@@ -82,8 +80,7 @@ public class ResetResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			}
 		} else {
@@ -95,8 +92,7 @@ public class ResetResource extends ServerResource {
 		// TODO Set the right warm start value.
 		String warmparamString = null;
 
-		Parameter warmparam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_START_MODE_RESET);
+		Parameter warmparam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_START_MODE_RESET);
 		if (warmparam != null) {
 			warmparamString = warmparam.getValue().trim();
 			try {
@@ -109,8 +105,7 @@ public class ResetResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
@@ -134,8 +129,7 @@ public class ResetResource extends ServerResource {
 			try {
 				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 
-				Status result = proxyGalInterface.resetDongleSync(timeout,
-						warmStartValue);
+				Status result = proxyGalInterface.resetDongleSync(timeout, warmStartValue);
 				Info info = new Info();
 				info.setStatus(result);
 				getResponse().setEntity(Util.marshal(info), MediaType.TEXT_XML);
@@ -148,8 +142,7 @@ public class ResetResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			}
 		} else {
@@ -168,9 +161,8 @@ public class ResetResource extends ServerResource {
 				infoToReturn.setStatus(status);
 				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+				return;
 			} catch (Exception e) {
 				Info info = new Info();
 				Status _st = new Status();
@@ -179,8 +171,7 @@ public class ResetResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			}
 		}

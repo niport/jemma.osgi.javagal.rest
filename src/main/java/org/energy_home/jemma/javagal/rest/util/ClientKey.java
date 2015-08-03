@@ -14,11 +14,13 @@
  *
  */
 package org.energy_home.jemma.javagal.rest.util;
+
 /**
  * Client identification key parameters.
  * 
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class ClientKey {
 	private String address;
@@ -67,8 +69,7 @@ public class ClientKey {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((address == null) ? 0 : address.hashCode())
-				+ ((port == -1) ? 0 : port);
+		result = prime * result + ((address == null) ? 0 : address.hashCode()) + ((port == -1) ? 0 : port);
 		return result;
 	}
 
@@ -81,11 +82,8 @@ public class ClientKey {
 		if (getClass() != obj.getClass())
 			return false;
 		ClientKey other = (ClientKey) obj;
-			if (other.getPort() == this.getPort()
-					&& other.getAddress().equals(this.getAddress()))
-				return true;
-
-
+		if (other.getPort() == this.getPort() && other.getAddress().equals(this.getAddress()))
+			return true;
 
 		return false;
 	}

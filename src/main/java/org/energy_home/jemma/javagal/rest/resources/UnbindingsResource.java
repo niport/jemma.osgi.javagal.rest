@@ -35,15 +35,15 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
- *  Resource file used to manage the API POST:removeBindingSync, removeBinding
- *
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API POST:removeBindingSync, removeBinding
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class UnbindingsResource extends ServerResource {
 	private GatewayInterface proxyGalInterface;
 
-	
 	@Post
 	public void processPost(String body) {
 
@@ -64,8 +64,7 @@ public class UnbindingsResource extends ServerResource {
 			return;
 
 		}
-		if ((binding.getDeviceDestination() == null)
-				|| binding.getDeviceDestination().size() != 1) {
+		if ((binding.getDeviceDestination() == null) || binding.getDeviceDestination().size() != 1) {
 
 			Info info = new Info();
 			Status _st = new Status();
@@ -82,8 +81,7 @@ public class UnbindingsResource extends ServerResource {
 		try {
 			Address _add = new Address();
 			// addrString parameters check
-			String addrString = (String) getRequest().getAttributes().get(
-					Resources.PARAMETER_ADDR);
+			String addrString = (String) getRequest().getAttributes().get(Resources.PARAMETER_ADDR);
 			if (addrString != null) {
 				if (addrString.length() > 4) {
 					// IEEEAddress
@@ -99,22 +97,18 @@ public class UnbindingsResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + Resources.URI_ADDR
-						+ "' parameter's value invalid. You provided: "
-						+ addrString);
+				_st.setMessage("Error: mandatory '" + Resources.URI_ADDR + "' parameter's value invalid. You provided: " + addrString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 
 			String timeoutString = null;
 			Long timeout = -1L;
-			Parameter timeoutParam = getRequest().getResourceRef()
-					.getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
+			Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 			if (timeoutParam != null) {
 				timeoutString = timeoutParam.getValue();
 				try {
@@ -124,15 +118,11 @@ public class UnbindingsResource extends ServerResource {
 						Info info = new Info();
 						Status _st = new Status();
 						_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-						_st.setMessage("Error: optional '"
-								+ ResourcePathURIs.TIMEOUT_PARAM
-								+ "' parameter's value invalid. You provided: "
-								+ timeoutString);
+						_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
 						info.setStatus(_st);
 						Info.Detail detail = new Info.Detail();
 						info.setDetail(detail);
-						getResponse().setEntity(Util.marshal(info),
-								MediaType.APPLICATION_XML);
+						getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 						return;
 
 					}
@@ -141,30 +131,23 @@ public class UnbindingsResource extends ServerResource {
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: optional '"
-							+ ResourcePathURIs.TIMEOUT_PARAM
-							+ "' parameter's value invalid. You provided: "
-							+ timeoutString);
+					_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
 			}
 
-			Parameter urilistenerParam = getRequest().getResourceRef()
-					.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+			Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 			if (urilistenerParam == null) {
 				// Sync call because urilistener not present.
 				// Gal Manager check
-				proxyGalInterface = getRestManager().getClientObjectKey(-1,
-						getClientInfo().getAddress()).getGatewayInterface();
-				Status status = proxyGalInterface.removeBindingSync(timeout,
-						binding);
+				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+				Status status = proxyGalInterface.removeBindingSync(timeout, binding);
 				Info info = new Info();
 				info.setStatus(status);
 				Info.Detail detail = new Info.Detail();
@@ -178,14 +161,11 @@ public class UnbindingsResource extends ServerResource {
 				// result but wait that the IPHA polls for it using the request
 				// identifier.
 
-				ClientResources rcmal = getRestManager().getClientObjectKey(
-						Util.getPortFromUriListener(urilistener),
-						getClientInfo().getAddress());
+				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 				proxyGalInterface = rcmal.getGatewayInterface();
-				rcmal.getClientEventListener().setUnbindingDestination(
-						urilistener);
+				rcmal.getClientEventListener().setUnbindingDestination(urilistener);
 				proxyGalInterface.removeBinding(timeout, binding);
-				
+
 				Info.Detail detail = new Info.Detail();
 				Info infoToReturn = new Info();
 				Status status = new Status();
@@ -193,8 +173,7 @@ public class UnbindingsResource extends ServerResource {
 				infoToReturn.setStatus(status);
 				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 				return;
 			}
 		} catch (NullPointerException npe) {

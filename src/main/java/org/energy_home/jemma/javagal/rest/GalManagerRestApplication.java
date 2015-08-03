@@ -57,13 +57,13 @@ import org.restlet.routing.Router;
 /**
  * The core Rest application. It associates incoming uri's to resources where
  * the right elaboration is made.
+ * 
  * @author 
  *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class GalManagerRestApplication extends Application {
 	private RestManager restManager;
-	
 
 	/**
 	 * Creates a new instance with a given rest manager.
@@ -97,24 +97,20 @@ public class GalManagerRestApplication extends Application {
 		 */
 		router.attach(Resources.GW_ROOT_URI + "/", firstLevelReources.class);
 
-		
 		/*
 		 * Defines Reset route "/reset"
 		 */
-		router.attach(Resources.GW_ROOT_URI + ResourcePathURIs.RESET,
-				ResetResource.class);
+		router.attach(Resources.GW_ROOT_URI + ResourcePathURIs.RESET, ResetResource.class);
 
 		/*
 		 * Defines StartupGatewayDevice route "/startup"
 		 */
-		router.attach(Resources.GW_ROOT_URI + ResourcePathURIs.STARTUP,
-				StartupResource.class);
+		router.attach(Resources.GW_ROOT_URI + ResourcePathURIs.STARTUP, StartupResource.class);
 
 		/*
 		 * Defines getVersion route "/version"
 		 */
-		router.attach(Resources.GW_ROOT_URI + ResourcePathURIs.VERSION,
-				GetVersionResource.class);
+		router.attach(Resources.GW_ROOT_URI + ResourcePathURIs.VERSION, GetVersionResource.class);
 
 		/*
 		 * ********** NETWORK RESOURCES **********
@@ -123,208 +119,158 @@ public class GalManagerRestApplication extends Application {
 		/*
 		 * Defines ListAddresses route "/net"
 		 */
-		router.attach(Resources.GW_ROOT_URI + Resources.NET_ROOT_URI,
-				netLevelReources.class);
+		router.attach(Resources.GW_ROOT_URI + Resources.NET_ROOT_URI, netLevelReources.class);
 
 		/*
 		 * Defines ListAddresses route "/net/default"
 		 */
-		router.attach(Resources.GW_ROOT_URI + Resources.NWT_ROOT_URI,
-				netDefaultLevelReources.class);
+		router.attach(Resources.GW_ROOT_URI + Resources.NWT_ROOT_URI, netDefaultLevelReources.class);
 
-		
 		/*
 		 * Defines getChannel route "net/default/channel"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.CHANNEL,
-				ChannelResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.CHANNEL, ChannelResource.class);
 
 		/*
 		 * Defines Information Base route "net/default/ib/"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.INFOBASE + "/"
-				, netDefaultIbLevelResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.INFOBASE + "/", netDefaultIbLevelResource.class);
 
 		/*
 		 * Defines Information Base route "net/default/ib/{attr}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.INFOBASE + "/"
-				+ Resources.URI_ATTR, InformationBaseResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.INFOBASE + "/" + Resources.URI_ATTR, InformationBaseResource.class);
 
-		
-		
 		/*
 		 * Defines ListAddresses route "/net/default/aliases"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALIASES,
-				ListAddressesResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALIASES, ListAddressesResource.class);
 
 		/*
 		 * Defines Callbacks route "/net/default/callbacks"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.CALLBACKS,
-				CallbacksResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.CALLBACKS, CallbacksResource.class);
 
 		/*
 		 * Defines Callbacks route "/net/default/callbacks/{id}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.CALLBACKS
-				+ Resources.URI_ID, CallbackResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.CALLBACKS + Resources.URI_ID, CallbackResource.class);
 
-		
 		/*
 		 * "/net/default/localnode"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE,
-				netDefaultLocalnodeLevelReources.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE, netDefaultLocalnodeLevelReources.class);
 
 		/*
 		 * "/net/default/localnode/allservices"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE
-				+ ResourcePathURIs.ALLSERVICES,
-				netDefaultLocalnodeAllservicesLevelResources.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE + ResourcePathURIs.ALLSERVICES, netDefaultLocalnodeAllservicesLevelResources.class);
 
 		/*
 		 * "/net/default/localnode/allservices/wsnconnection"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.LOCALNODE_ALLSERVICES_WSNCONNECTION,
-				CallbacksShorthandAllServicesResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE_ALLSERVICES_WSNCONNECTION, CallbacksShorthandAllServicesResource.class);
 
 		/*
 		 * Defines Frequency Agility route
 		 * "/net/default/localnode/frequencyagility?timeout={0:x8}&scanChannel={1}&scanDuration={2}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.URI_FREQUENCY_AGILITY,
-				FrequenceAgilityResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.URI_FREQUENCY_AGILITY, FrequenceAgilityResource.class);
 
 		/*
 		 * Defines LocalServices route "/net/default/localnode/services"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.LOCALNODE_SERVICES,
-				LocalServicesResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE_SERVICES, LocalServicesResource.class);
 
 		/*
 		 * Defines LocalServices route "/net/default/localnode/services/{ep}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_ENDPOINT,
-				LocalServicesResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_ENDPOINT, LocalServicesResource.class);
 
 		/*
 		 * "/net/default/localnode/services/{ep}/"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_ENDPOINT,
-				netDefaultLocalnodeServicesEndPointLevelResources.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_ENDPOINT, netDefaultLocalnodeServicesEndPointLevelResources.class);
 
 		/*
 		 * "/net/default/localnode/services/{ep}/wsnconnection"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_ENDPOINT
-				+ ResourcePathURIs.WSNCONNECTION,
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_ENDPOINT + ResourcePathURIs.WSNCONNECTION,
 				CallbacksShorthandForEndpointResource.class);
 
 		/*
 		 * Defines Send APS Message route
 		 * "/net/default/localnode/services/{0:x2}/wsnconnection/message?timeout={1:x8}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_SERVICE
-				+ ResourcePathURIs.SEND_APSMESSAGE,
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.LOCALNODE_SERVICES + Resources.URI_SERVICE + ResourcePathURIs.SEND_APSMESSAGE,
 				SendAPSMessageOrZCLCommandResource.class);
 
 		/*
 		 * Defines PermitjoinAll route "/net/default/allwsnnodes"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLWSNNODES,
-				LeaveAllResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLWSNNODES, LeaveAllResource.class);
 
 		/*
 		 * Defines route "/net/default/allwsnnodes/services?mode=cache"
 		 */
-		router.attach(Resources.NWT_ROOT_URI
-				+ ResourcePathURIs.ALLWSNNODES_SERVICES,
-				ReadServiceCacheResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLWSNNODES_SERVICES, ReadServiceCacheResource.class);
 
 		/*
 		 * Defines PermitjoinAll route "/net/default/allwsnnodes/permitjoin"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLPERMIT_JOIN,
-				PermitJoinAllResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLPERMIT_JOIN, PermitJoinAllResource.class);
 
 		/*
 		 * Defines GenNetworkCache route "/net/default/wsnnodes"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES,
-				NodesResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES, NodesResource.class);
 
 		/*
 		 * Defines GenNetworkCache route "/net/default/wsnnodes/{addr}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR, SendZdpAndInterPANAndLeaveResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR, SendZdpAndInterPANAndLeaveResource.class);
 
 		/*
 		 * GetNodeDescriptor route "/net/default/wsnnodes/{addr}/bindings"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR + ResourcePathURIs.BINDINGS,
-				BindingsResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR + ResourcePathURIs.BINDINGS, BindingsResource.class);
 
 		/*
 		 * GetNodeDescriptor route "/net/default/wsnnodes/{addr}/nodedescriptor"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR + ResourcePathURIs.NODEDESCRIPTOR,
-				GetNodeDescriptorResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR + ResourcePathURIs.NODEDESCRIPTOR, GetNodeDescriptorResource.class);
 
 		/*
 		 * GetNodeDescriptor route "/net/default/wsnnodes/{addr}/unbindings"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR + ResourcePathURIs.UNBINDINGS,
-				UnbindingsResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR + ResourcePathURIs.UNBINDINGS, UnbindingsResource.class);
 
 		/*
 		 * GetServiceDescriptor route
 		 * "/net/default/wsnnodes/{addr}/services/{ep}"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR + ResourcePathURIs.SERVICES
-				+ Resources.URI_ENDPOINT, GetServiceDescriptorResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR + ResourcePathURIs.SERVICES + Resources.URI_ENDPOINT,
+				GetServiceDescriptorResource.class);
 
 		/*
 		 * LocalServices route "/net/default/wsnnodes/{addr}/services"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR + ResourcePathURIs.SERVICES,
-				ServicesResource.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR + ResourcePathURIs.SERVICES, ServicesResource.class);
 
 		/*
 		 * Defines Permitjoin route "/net/default/wsnnodes/{addr}/permitjoin"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_AOI + ResourcePathURIs.PERMIT_JOIN,
-				PermitJoinResource.class);
-		
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_AOI + ResourcePathURIs.PERMIT_JOIN, PermitJoinResource.class);
+
 		/*
 		 * LocalServices route "/net/default/wsnnodes/lqi"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLWSNNODES
-				+  ResourcePathURIs.LQIINFORMATION,
-				allLqiInformationClass.class);
-		
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.ALLWSNNODES + ResourcePathURIs.LQIINFORMATION, allLqiInformationClass.class);
+
 		/*
 		 * LocalServices route "/net/default/wsnnodes/{addr}/lqi"
 		 */
-		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES
-				+ Resources.URI_ADDR + ResourcePathURIs.LQIINFORMATION,
-				lqiInformationClass.class);
+		router.attach(Resources.NWT_ROOT_URI + ResourcePathURIs.WSNNODES + Resources.URI_ADDR + ResourcePathURIs.LQIINFORMATION, lqiInformationClass.class);
 
 		return router;
 	}

@@ -39,7 +39,8 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
- * Resource file used to manage the API GET:getLocalServices. POST:configureEndpoint. DELETE:ClearEndPoint 
+ * Resource file used to manage the API GET:getLocalServices.
+ * POST:configureEndpoint. DELETE:ClearEndPoint
  * 
  * @author 
  *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
@@ -47,23 +48,20 @@ import org.restlet.resource.ServerResource;
  */
 public class LocalServicesResource extends ServerResource {
 
-
 	private GatewayInterface proxyGalInterface;
 	private String timeoutString = null;
 	private Long timeout = (long) INTERNAL_TIMEOUT;
 
 	@Get
 	public void processGet() {
-		String epString = (String) getRequest().getAttributes().get(
-				Resources.PARAMETER_EP);
+		String epString = (String) getRequest().getAttributes().get(Resources.PARAMETER_EP);
 
 		if (epString == null) {
 
 			// GetLocalServices (GET method with /{ep} not present)
 			NodeServices services = null;
 			try {
-				proxyGalInterface = getRestManager().getClientObjectKey(-1,
-						getClientInfo().getAddress()).getGatewayInterface();
+				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 				services = proxyGalInterface.getLocalServices();
 				Detail _det = new Detail();
 				_det.setNodeServices(services);
@@ -72,8 +70,7 @@ public class LocalServicesResource extends ServerResource {
 				_st.setCode((short) GatewayConstants.SUCCESS);
 				_info.setStatus(_st);
 				_info.setDetail(_det);
-				getResponse().setEntity(Util.marshal(_info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
 				return;
 			} catch (NullPointerException npe) {
 				Info info = new Info();
@@ -83,8 +80,7 @@ public class LocalServicesResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			} catch (Exception e) {
@@ -95,8 +91,7 @@ public class LocalServicesResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
@@ -120,12 +115,10 @@ public class LocalServicesResource extends ServerResource {
 	@Post
 	public void processPost(String body) {
 
-		String epString = (String) getRequest().getAttributes().get(
-				Resources.PARAMETER_EP);
+		String epString = (String) getRequest().getAttributes().get(Resources.PARAMETER_EP);
 
 		if (epString == null) {
-			Parameter timeoutParam = getRequest().getResourceRef()
-					.getQueryAsForm().getFirst(ResourcePathURIs.TIMEOUT_PARAM);
+			Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(ResourcePathURIs.TIMEOUT_PARAM);
 			if (timeoutParam != null) {
 				timeoutString = timeoutParam.getValue().trim();
 				try {
@@ -138,8 +131,7 @@ public class LocalServicesResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
@@ -149,15 +141,11 @@ public class LocalServicesResource extends ServerResource {
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: optional '"
-							+ ResourcePathURIs.TIMEOUT_PARAM
-							+ "' parameter's value invalid. You provided: "
-							+ timeoutString);
+					_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
@@ -175,8 +163,7 @@ public class LocalServicesResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
@@ -185,12 +172,10 @@ public class LocalServicesResource extends ServerResource {
 
 			try {
 				// Gal Manager check
-				proxyGalInterface = getRestManager().getClientObjectKey(-1,
-						getClientInfo().getAddress()).getGatewayInterface();
+				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 
 				// ConfigureEndpoint
-				short endPoint = proxyGalInterface.configureEndpoint(timeout,
-						simpleDescriptor);
+				short endPoint = proxyGalInterface.configureEndpoint(timeout, simpleDescriptor);
 				if (endPoint > 0) {
 
 					Info info = new Info();
@@ -200,8 +185,7 @@ public class LocalServicesResource extends ServerResource {
 					Info.Detail detail = new Info.Detail();
 					detail.setEndpoint(endPoint);
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				} else {
@@ -213,8 +197,7 @@ public class LocalServicesResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 
 				}
@@ -226,8 +209,7 @@ public class LocalServicesResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			} catch (Exception e1) {
@@ -238,8 +220,7 @@ public class LocalServicesResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			}
 
@@ -252,11 +233,9 @@ public class LocalServicesResource extends ServerResource {
 		try {
 
 			String epString = "";
-			epString = (String) getRequest().getAttributes().get(
-					Resources.PARAMETER_EP);
+			epString = (String) getRequest().getAttributes().get(Resources.PARAMETER_EP);
 
-			proxyGalInterface = getRestManager().getClientObjectKey(-1,
-					getClientInfo().getAddress()).getGatewayInterface();
+			proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 			Short endpoint = Short.parseShort(epString, 16);
 
 			// ClearEndpoint

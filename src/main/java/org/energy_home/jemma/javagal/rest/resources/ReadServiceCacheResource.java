@@ -31,10 +31,11 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- *  Resource file used to manage the API GET:readServicesCache, readNodeCache
- *
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API GET:readServicesCache, readNodeCache
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class ReadServiceCacheResource extends ServerResource {
 
@@ -44,15 +45,13 @@ public class ReadServiceCacheResource extends ServerResource {
 	public void readServiceCacheGetmethod() {
 
 		String modeString = null;
-		Parameter modeParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_MODE);
+		Parameter modeParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_MODE);
 		if (modeParam == null) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_MODE
-					+ "' parameter missing.");
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_MODE + "' parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
@@ -64,15 +63,12 @@ public class ReadServiceCacheResource extends ServerResource {
 			if (modeString.equals("cache")) {
 
 				try {
-					proxyGalInterface = getRestManager().getClientObjectKey(-1,
-							getClientInfo().getAddress()).getGatewayInterface();
-					NodeServicesList _result = proxyGalInterface
-							.readServicesCache();
+					proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+					NodeServicesList _result = proxyGalInterface.readServicesCache();
 
 					Info.Detail detail = new Info.Detail();
 					detail.setNodeServicesList(_result);
-					getResponse().setEntity(Util.marshal(detail),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(detail), MediaType.APPLICATION_XML);
 					return;
 
 				} catch (Exception npe) {
@@ -83,16 +79,14 @@ public class ReadServiceCacheResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				}
 
 			} else {
 				try {
 					// Gal Manager check
-					proxyGalInterface = getRestManager().getClientObjectKey(-1,
-							getClientInfo().getAddress()).getGatewayInterface();
+					proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 					WSNNodeList nodeList = proxyGalInterface.readNodeCache();
 					Status status = new Status();
 					status.setCode((short) GatewayConstants.SUCCESS);
@@ -102,8 +96,7 @@ public class ReadServiceCacheResource extends ServerResource {
 					detail.setWSNNodes(nodeList);
 					info.setDetail(detail);
 					getResponse().setStatus(new org.restlet.data.Status(200));
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				} catch (NullPointerException npe) {
 					Info info = new Info();
@@ -113,8 +106,7 @@ public class ReadServiceCacheResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				} catch (Exception e1) {
 					Info info = new Info();
@@ -124,8 +116,7 @@ public class ReadServiceCacheResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				}
 			}

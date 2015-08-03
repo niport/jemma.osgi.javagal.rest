@@ -20,13 +20,11 @@ import java.util.Map;
 
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 
-
-
 /**
  * Implementation for {@code NamespacePrefixMapper}.
  * 
- * @author
- *   "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
@@ -39,7 +37,7 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 		prefixToUri = new HashMap();
 		prefixToUri.put("tns", "http://www.zigbee.org/GWGRESTSchema");
 		prefixToUri.put("gal", "http://www.zigbee.org/GWGSchema");
-		
+
 		uriToPrefix = new HashMap();
 		for (Object prefix : prefixToUri.keySet()) {
 			uriToPrefix.put(prefixToUri.get(prefix), prefix);
@@ -47,8 +45,7 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 	}
 
 	@Override
-	public String getPreferredPrefix(String namespaceUri, String suggestion,
-			boolean requirePrefix) {
+	public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
 		if (uriToPrefix == null)
 			init();
 

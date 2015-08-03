@@ -55,8 +55,7 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 	private GatewayInterface proxyGalInterface;
 
 	@Options
-	public void doOptions()
-	{
+	public void doOptions() {
 		Series<Header> responseHeaders = (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
 		if (responseHeaders == null) {
 			responseHeaders = new Series(Header.class);
@@ -67,8 +66,7 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 		responseHeaders.add("Access-Control-Allow-Headers", "Content-Type");
 		responseHeaders.add("Access-Control-Max-Age", "60");
 	}
-	
-	
+
 	@Get
 	public void processGet() {
 		Detail _det = new Detail();
@@ -95,16 +93,17 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 		// Uri parameters check
 		String timeoutString = null;
 		String urilistener = null;
-		String aoiString = null; // Note aoiString is correct even if we read the addr parameter and we call it aoi
+		String aoiString = null; // Note aoiString is correct even if we read
+									// the addr parameter and we call it aoi
 		Long timeout = -1l;
 		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-		
+
 		Series<Header> responseHeaders = (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
 		if (responseHeaders == null) {
-		responseHeaders = new Series(Header.class);
-		getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
+			responseHeaders = new Series(Header.class);
+			getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
 		}
-		//allow request from other origins
+		// allow request from other origins
 		responseHeaders.add(new Header("Access-Control-Allow-Origin", "*"));
 
 		if (timeoutParam == null) {

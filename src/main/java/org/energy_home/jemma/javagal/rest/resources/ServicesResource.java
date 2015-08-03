@@ -38,10 +38,12 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
 /**
- *  Resource file used to manage the API GET:startServiceDiscoverySync, startServiceDiscovery
- *  
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * Resource file used to manage the API GET:startServiceDiscoverySync,
+ * startServiceDiscovery
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class ServicesResource extends ServerResource {
 
@@ -54,16 +56,14 @@ public class ServicesResource extends ServerResource {
 		String addrString = (String) getRequest().getAttributes().get("addr");
 		Address address = new Address();
 		if (addrString.length() > 4) {
-			BigInteger addressBigInteger = BigInteger.valueOf(Long.parseLong(
-					addrString, 16));
+			BigInteger addressBigInteger = BigInteger.valueOf(Long.parseLong(addrString, 16));
 			address.setIeeeAddress(addressBigInteger);
 		} else {
 			Integer addressInteger = Integer.parseInt(addrString, 16);
 			address.setNetworkAddress(addressInteger);
 		}
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam != null) {
 			timeoutString = timeoutParam.getValue().trim();
 			try {
@@ -74,16 +74,12 @@ public class ServicesResource extends ServerResource {
 					Info info = new Info();
 					Status _st = new Status();
 					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: optional '"
-							+ ResourcePathURIs.TIMEOUT_PARAM
-							+ "' parameter's value invalid. You provided: "
-							+ timeoutString);
+					_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
-					return ;
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+					return;
 
 				}
 			} catch (NumberFormatException nfe) {
@@ -91,24 +87,19 @@ public class ServicesResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: optional '"
-						+ ResourcePathURIs.TIMEOUT_PARAM
-						+ "' parameter's value invalid. You provided: "
-						+ timeoutString);
+				_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 		}
 
 		// Urilistener parameter
 		String urilistener = null;
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 		// Urilistener is mandatory
 		if (urilistenerParam != null) {
 			// TODO Marco why getSecond() and not getValue()?
@@ -120,10 +111,8 @@ public class ServicesResource extends ServerResource {
 			if (urilistener == null) {
 				// Synch StartServiceDiscovery
 				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
-				NodeServices node = proxyGalInterface
-						.startServiceDiscoverySync(timeout, address);
-				
-				
+				NodeServices node = proxyGalInterface.startServiceDiscoverySync(timeout, address);
+
 				Info.Detail detail = new Info.Detail();
 				detail.setNodeServices(node);
 				Info infoToReturn = new Info();
@@ -131,10 +120,9 @@ public class ServicesResource extends ServerResource {
 				status.setCode((short) GatewayConstants.SUCCESS);
 				infoToReturn.setStatus(status);
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
-				
-				return ;
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+
+				return;
 			} else {
 				// Asynch
 				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
@@ -150,9 +138,8 @@ public class ServicesResource extends ServerResource {
 				infoToReturn.setStatus(status);
 				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+				return;
 			}
 
 		} catch (NullPointerException npe) {
@@ -164,7 +151,7 @@ public class ServicesResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} catch (Exception e) {
 			Info info = new Info();
@@ -175,7 +162,7 @@ public class ServicesResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 		}
 	}
 

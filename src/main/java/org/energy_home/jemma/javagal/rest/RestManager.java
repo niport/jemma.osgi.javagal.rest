@@ -15,7 +15,6 @@
  */
 package org.energy_home.jemma.javagal.rest;
 
-
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,14 +38,15 @@ import org.slf4j.LoggerFactory;
  * different clients. The Rest server identify each client by its unique address
  * and ip port.
  * 
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class RestManager {
 	private final ConcurrentHashMap<ClientKey, ClientResources> clientsMap = new ConcurrentHashMap<ClientKey, ClientResources>();
 	private boolean proxyActive = false;
 	private GalExtenderProxyFactory factory;
-	private static final Logger LOG = LoggerFactory.getLogger( RestManager.class );
+	private static final Logger LOG = LoggerFactory.getLogger(RestManager.class);
 	private Component component;
 	private PropertiesManager _PropertiesManager = null;
 
@@ -68,8 +68,7 @@ public class RestManager {
 	 * @param factory
 	 *            the gal extender proxy factory.
 	 */
-	public RestManager(PropertiesManager __PropertiesManager,
-			GalExtenderProxyFactory factory) {
+	public RestManager(PropertiesManager __PropertiesManager, GalExtenderProxyFactory factory) {
 		this.proxyActive = true;
 		this.factory = factory;
 		_PropertiesManager = __PropertiesManager;
@@ -77,8 +76,7 @@ public class RestManager {
 		component = new Component();
 		// Add a new server listening on port.
 
-		Server _newserver = new Server(Protocol.HTTP,
-				_PropertiesManager.getIPPort());
+		Server _newserver = new Server(Protocol.HTTP, _PropertiesManager.getIPPort());
 
 		component.getServers().add(_newserver);
 
@@ -90,7 +88,7 @@ public class RestManager {
 		try {
 			component.start();
 		} catch (Exception e) {
-			LOG.error("Error starting Rest: ",e);
+			LOG.error("Error starting Rest: ", e);
 		}
 	}
 
@@ -130,7 +128,7 @@ public class RestManager {
 			component.stop();
 		} catch (Exception e) {
 			if (_PropertiesManager.getDebugEnabled())
-				LOG.error("Error stopping rest server component:",e);
+				LOG.error("Error stopping rest server component:", e);
 		}
 
 	}
@@ -159,8 +157,7 @@ public class RestManager {
 	 *             if the factory fails to create a new gateway interface
 	 *             object, due to some internal error.
 	 */
-	synchronized public ClientResources getClientObjectKey(int port,
-			String address) throws Exception {
+	synchronized public ClientResources getClientObjectKey(int port, String address) throws Exception {
 		if (!isProxyActive())
 			return null;
 
@@ -184,8 +181,7 @@ public class RestManager {
 				}
 
 			} else if (myClientToReturn == null && clientKey.getPort() == -1) {
-				for (Iterator<Entry<ClientKey, ClientResources>> it = clientsMap.entrySet().iterator(); it
-						.hasNext();) {
+				for (Iterator<Entry<ClientKey, ClientResources>> it = clientsMap.entrySet().iterator(); it.hasNext();) {
 					ClientKey p = (ClientKey) it.next().getKey();
 					if (p.getAddress().equals(clientKey.getAddress())) {
 						myClientToReturn = clientsMap.get(p);
@@ -201,13 +197,11 @@ public class RestManager {
 			if (clientKey.getPort() > -1)
 				myClientToReturn.setGatewayEventListener();
 			if (getPropertiesManager().getDebugEnabled()) {
-				LOG.debug("Get proxy client: Port: " + clientKey.getPort()+" Address: " + clientKey.getAddress());
+				LOG.debug("Get proxy client: Port: " + clientKey.getPort() + " Address: " + clientKey.getAddress());
 			}
 
 		} else {
-			myClientToReturn = new ClientResources(getPropertiesManager(),
-					getFactory().createGatewayInterfaceObject(), clientKey,
-					this);
+			myClientToReturn = new ClientResources(getPropertiesManager(), getFactory().createGatewayInterfaceObject(), clientKey, this);
 			if (clientKey.getPort() > -1)
 				myClientToReturn.setGatewayEventListener();
 			synchronized (clientsMap) {
@@ -231,8 +225,7 @@ public class RestManager {
 	 * @throws Exception
 	 *             if an error occurs.
 	 */
-	synchronized public void removeClientObjectKey(ClientKey key)
-			throws Exception {
+	synchronized public void removeClientObjectKey(ClientKey key) throws Exception {
 		if (clientsMap.containsKey(key))
 			clientsMap.remove(key);
 

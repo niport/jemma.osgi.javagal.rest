@@ -18,8 +18,9 @@ package org.energy_home.jemma.javagal.rest.util;
 /**
  * Resources class.
  * 
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public class Resources {
 	/*
@@ -29,14 +30,13 @@ public class Resources {
 	// Note that we consider only one net, so we have the only "default" one
 	public final static String NET_ROOT_URI = "/net";
 	public static String NET_DEFAULT_ROOT_URI = "/default";
+
 	public static void setNET_DEFAULT_ROOT_URI(String nET_DEFAULT_ROOT_URI) {
 		NET_DEFAULT_ROOT_URI = "/" + nET_DEFAULT_ROOT_URI;
-		NWT_ROOT_URI = GW_ROOT_URI + NET_ROOT_URI
-				+ NET_DEFAULT_ROOT_URI;
+		NWT_ROOT_URI = GW_ROOT_URI + NET_ROOT_URI + NET_DEFAULT_ROOT_URI;
 	}
 
-	public static String NWT_ROOT_URI = GW_ROOT_URI + NET_ROOT_URI
-			+ NET_DEFAULT_ROOT_URI;
+	public static String NWT_ROOT_URI = GW_ROOT_URI + NET_ROOT_URI + NET_DEFAULT_ROOT_URI;
 
 	/*
 	 * URIs
@@ -47,7 +47,7 @@ public class Resources {
 	public final static String URI_PARAM_INDEX = "index";
 	public final static String URI_PARAM_MODE = "mode";
 	public final static String URI_PARAM_CACHE = "cache";
-	
+
 	public final static String URI_ID = "/{id}";
 	public final static String URI_ADDR = "/{addr}";
 	public final static String URI_ENDPOINT = "/{ep}";

@@ -38,17 +38,18 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
-* Resource file used to manage the API GET:createAPSCallback(ep,listener)
-* 
-* @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
-*
-*/
+ * Resource file used to manage the API GET:createAPSCallback(ep,listener)
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
+ */
 public class CallbacksShorthandForEndpointResource extends ServerResource {
 
 	private GatewayInterface proxyGalInterface = null;
 
 	@Get
-	public void represent()  {
+	public void represent() {
 		Detail _det = new Detail();
 		Info _info = new Info();
 		Status _st = new Status();
@@ -59,7 +60,7 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 		getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
 		return;
 	}
-	
+
 	@Post
 	public void processPost(String body) {
 
@@ -69,8 +70,7 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 		Callback callback = new Callback();
 		Long ep = -1l;
 
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 		if (urilistenerParam != null && !urilistenerParam.equals("")) {
 			urilistener = urilistenerParam.getValue().trim();
 		} else {
@@ -81,31 +81,28 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Mandatory " + Resources.URI_PARAM_URILISTENER
-					+ " parameter missing.");
+			_st.setMessage("Mandatory " + Resources.URI_PARAM_URILISTENER + " parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 
-		epString = (String) getRequest().getAttributes().get(
-				Resources.PARAMETER_EP);
+		epString = (String) getRequest().getAttributes().get(Resources.PARAMETER_EP);
 
 		if (epString == null) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory " + Resources.PARAMETER_EP
-					+ " parameter missing. (Unsigned8)");
+			_st.setMessage("Error: mandatory " + Resources.PARAMETER_EP + " parameter missing. (Unsigned8)");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} else {
 			try {
@@ -114,15 +111,12 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory " + Resources.PARAMETER_EP
-						+ " parameter incorrect (Unsigned32). You provided: "
-						+ epString);
+				_st.setMessage("Error: mandatory " + Resources.PARAMETER_EP + " parameter incorrect (Unsigned32). You provided: " + epString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 		}
@@ -130,28 +124,22 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory " + Resources.PARAMETER_EP
-					+ " parameter's value invalid (Unsigned8). You provided: "
-					+ ep);
+			_st.setMessage("Error: mandatory " + Resources.PARAMETER_EP + " parameter's value invalid (Unsigned8). You provided: " + ep);
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 
 		// Actual Gal call
 		try {
 			// Rest Client Manager And Listener
-			ClientResources rcmal = getRestManager().getClientObjectKey(
-					Util.getPortFromUriListener(urilistener),
-					getClientInfo().getAddress());
+			ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 			proxyGalInterface = rcmal.getGatewayInterface();
-			RestApsMessageListener listener = new RestApsMessageListener(
-					callback, urilistener,rcmal,getRestManager().getPropertiesManager());
-			Long id = proxyGalInterface.createAPSCallback(ep.shortValue(),
-					listener);
+			RestApsMessageListener listener = new RestApsMessageListener(callback, urilistener, rcmal, getRestManager().getPropertiesManager());
+			Long id = proxyGalInterface.createAPSCallback(ep.shortValue(), listener);
 
 			if (id >= 0) {
 				listener.setCallBackId(id);
@@ -164,12 +152,9 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 				status.setCode((short) GatewayConstants.SUCCESS);
 				infoToReturn.setStatus(status);
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 				return;
-				
-				
-				
+
 			} else {
 
 				Info info = new Info();
@@ -179,9 +164,8 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
-				return ;
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				return;
 
 			}
 		} catch (NullPointerException npe) {
@@ -194,7 +178,7 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} catch (Exception e1) {
 			Info info = new Info();
@@ -205,9 +189,9 @@ public class CallbacksShorthandForEndpointResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 		}
-		
+
 	}
 
 	/**

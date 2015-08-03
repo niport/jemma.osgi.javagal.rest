@@ -35,11 +35,12 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
-* Resource file used to manage the API POST:createAPSCallback(listener)
-* 
-* @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
-*
-*/
+ * Resource file used to manage the API POST:createAPSCallback(listener)
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
+ */
 public class CallbacksShorthandAllServicesResource extends ServerResource {
 
 	private GatewayInterface proxyGalInterface = null;
@@ -51,8 +52,7 @@ public class CallbacksShorthandAllServicesResource extends ServerResource {
 		String urilistener = null;
 		Callback callback = new Callback();
 
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 		if (urilistenerParam != null && !urilistenerParam.equals("")) {
 			urilistener = urilistenerParam.getValue().trim();
 		} else {
@@ -62,28 +62,23 @@ public class CallbacksShorthandAllServicesResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Mandatory " + Resources.URI_PARAM_URILISTENER
-					+ " parameter missing.");
+			_st.setMessage("Mandatory " + Resources.URI_PARAM_URILISTENER + " parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 
 		// Actual Gal call
 		try {
 			// Rest Client Manager And Listener
-			ClientResources rcmal = getRestManager().getClientObjectKey(
-					Util.getPortFromUriListener(urilistener),
-					getClientInfo().getAddress());
+			ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 			proxyGalInterface = rcmal.getGatewayInterface();
-		
 
 			// The callback set on the listener is empty
-			RestApsMessageListener listener = new RestApsMessageListener(
-					callback, urilistener,rcmal,getRestManager().getPropertiesManager());
+			RestApsMessageListener listener = new RestApsMessageListener(callback, urilistener, rcmal, getRestManager().getPropertiesManager());
 			Long id = proxyGalInterface.createAPSCallback(listener);
 
 			if (id >= 0) {
@@ -96,14 +91,9 @@ public class CallbacksShorthandAllServicesResource extends ServerResource {
 				status.setCode((short) GatewayConstants.SUCCESS);
 				infoToReturn.setStatus(status);
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 				return;
-				
-				
-		
-				
-			
+
 			}
 		} catch (Exception e1) {
 
@@ -115,13 +105,12 @@ public class CallbacksShorthandAllServicesResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		}
 
-		
 	}
-	
+
 	/**
 	 * Gets the RestManager.
 	 * 

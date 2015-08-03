@@ -37,8 +37,10 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 /**
- *  Resource file used to manage the API GET:readStartupAttributeSet. POST:configureStartupAttributeSet, startGatewayDeviceSync, startGatewayDevice. DELETE:stopNetworkSync, stopNetwork
- *
+ * Resource file used to manage the API GET:readStartupAttributeSet.
+ * POST:configureStartupAttributeSet, startGatewayDeviceSync,
+ * startGatewayDevice. DELETE:stopNetworkSync, stopNetwork
+ * 
  * @author 
  *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
  * 
@@ -53,10 +55,8 @@ public class StartupResource extends ServerResource {
 		String indexString = "";
 		Long index = -1l;
 
-		Parameter indexParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_INDEX);
-		if (indexParam == null)
-		{
+		Parameter indexParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_INDEX);
+		if (indexParam == null) {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
@@ -66,8 +66,7 @@ public class StartupResource extends ServerResource {
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 			return;
-		}
-		else
+		} else
 			indexString = indexParam.getValue().trim();
 		try {
 			index = Long.decode("0x" + indexString);
@@ -89,9 +88,7 @@ public class StartupResource extends ServerResource {
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT
-					+ "' parameter's value invalid. You provided: "
-					+ indexString);
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + indexString);
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
@@ -101,11 +98,9 @@ public class StartupResource extends ServerResource {
 
 		try {
 			// Gal Manager check
-			proxyGalInterface = getRestManager().getClientObjectKey(-1,
-					getClientInfo().getAddress()).getGatewayInterface();
+			proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 			// ReadStartupAttributeSet
-			StartupAttributeInfo sai = proxyGalInterface
-					.readStartupAttributeSet(index.shortValue());
+			StartupAttributeInfo sai = proxyGalInterface.readStartupAttributeSet(index.shortValue());
 
 			Info.Detail detail = new Info.Detail();
 			detail.setStartupAttributeInfo(sai);
@@ -114,8 +109,7 @@ public class StartupResource extends ServerResource {
 			status.setCode((short) GatewayConstants.SUCCESS);
 			infoToReturn.setStatus(status);
 			infoToReturn.setDetail(detail);
-			getResponse().setEntity(Util.marshal(infoToReturn),
-					MediaType.TEXT_XML);
+			getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 
 			return;
 		} catch (Exception e) {
@@ -141,8 +135,7 @@ public class StartupResource extends ServerResource {
 		String urilistener = null;
 		Long timeout = -1l;
 
-		Parameter startParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_START);
+		Parameter startParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_START);
 		if (startParam == null) {
 			Info info = new Info();
 			Status _st = new Status();
@@ -160,28 +153,23 @@ public class StartupResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_START
-						+ "' parameter's value invalid. You provided: "
-						+ startString);
+				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_START + "' parameter's value invalid. You provided: " + startString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 		}
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam == null) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT
-					+ "' parameter missing.");
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
@@ -199,21 +187,16 @@ public class StartupResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '"
-						+ Resources.URI_PARAM_TIMEOUT
-						+ "' parameter's value invalid. You provided: "
-						+ timeoutString);
+				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 		}
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 		// Actual Gal call
 		if (urilistenerParam == null) {
@@ -224,18 +207,14 @@ public class StartupResource extends ServerResource {
 				try {
 					sai = Util.unmarshal(body, StartupAttributeInfo.class);
 					// Gal Manager check
-					proxyGalInterface = getRestManager().getClientObjectKey(-1,
-							getClientInfo().getAddress()).getGatewayInterface();
+					proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 					// StartGatewayDevice synch
-					Status status = proxyGalInterface.startGatewayDeviceSync(
-							timeout, sai);
+					Status status = proxyGalInterface.startGatewayDeviceSync(timeout, sai);
 					Info info = new Info();
 					info.setStatus(status);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
-					
-					
+
 				} catch (Exception e1) {
 					Info info = new Info();
 					Status _st = new Status();
@@ -244,8 +223,7 @@ public class StartupResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				}
 			} else {
@@ -254,8 +232,7 @@ public class StartupResource extends ServerResource {
 				try {
 					sai = Util.unmarshal(body, StartupAttributeInfo.class);
 					// Gal Manager check
-					proxyGalInterface = getRestManager().getClientObjectKey(-1,
-							getClientInfo().getAddress()).getGatewayInterface();
+					proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 					// ConfigureStartupAttributeSet
 					proxyGalInterface.configureStartupAttributeSet(sai);
 					Info.Detail detail = new Info.Detail();
@@ -265,8 +242,7 @@ public class StartupResource extends ServerResource {
 					infoToReturn.setStatus(status);
 					infoToReturn.setDetail(detail);
 
-					getResponse().setEntity(Util.marshal(infoToReturn),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.APPLICATION_XML);
 					return;
 
 				} catch (Exception e1) {
@@ -278,8 +254,7 @@ public class StartupResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				}
 			}
@@ -296,15 +271,11 @@ public class StartupResource extends ServerResource {
 				try {
 					sai = Util.unmarshal(body, StartupAttributeInfo.class);
 					// Gal Manager check
-					ClientResources rcmal = getRestManager()
-							.getClientObjectKey(
-									Util.getPortFromUriListener(urilistener),
-									getClientInfo().getAddress());
+					ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 
 					proxyGalInterface = rcmal.getGatewayInterface();
 					if (!urilistener.equals("")) {
-						rcmal.getClientEventListener()
-								.setStartGatewayDestination(urilistener);
+						rcmal.getClientEventListener().setStartGatewayDestination(urilistener);
 					}
 					proxyGalInterface.startGatewayDevice(timeout, sai);
 					Info.Detail detail = new Info.Detail();
@@ -312,11 +283,9 @@ public class StartupResource extends ServerResource {
 					Status status = new Status();
 					status.setCode((short) GatewayConstants.SUCCESS);
 					infoToReturn.setStatus(status);
-					infoToReturn.setRequestIdentifier(Util
-							.getRequestIdentifier());
+					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn),
-							MediaType.TEXT_XML);
+					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 					return;
 
 				} catch (Exception e1) {
@@ -327,8 +296,7 @@ public class StartupResource extends ServerResource {
 					info.setStatus(_st);
 					Info.Detail detail = new Info.Detail();
 					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info),
-							MediaType.APPLICATION_XML);
+					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 					return;
 				}
 			} else {
@@ -339,8 +307,7 @@ public class StartupResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			}
 		}
@@ -354,15 +321,13 @@ public class StartupResource extends ServerResource {
 		String urilistener = null;
 		Long timeout = -1l;
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm()
-				.getFirst(Resources.URI_PARAM_TIMEOUT);
+		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
 		if (timeoutParam == null) {
 
 			Info info = new Info();
 			Status _st = new Status();
 			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT
-					+ "' parameter missing.");
+			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
 			info.setStatus(_st);
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
@@ -381,8 +346,7 @@ public class StartupResource extends ServerResource {
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
@@ -390,45 +354,37 @@ public class StartupResource extends ServerResource {
 				Info info = new Info();
 				Status _st = new Status();
 				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '"
-						+ Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
+				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
 				info.setStatus(_st);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 
 			}
 		}
 
-		Parameter urilistenerParam = getRequest().getResourceRef()
-				.getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 		try {
 			if (urilistenerParam == null) {
 				// Sync call because urilistener not present.
-				proxyGalInterface = getRestManager().getClientObjectKey(-1,
-						getClientInfo().getAddress()).getGatewayInterface();
+				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 				Status status = proxyGalInterface.stopNetworkSync(timeout);
 				Info info = new Info();
 				info.setStatus(status);
 				Info.Detail detail = new Info.Detail();
 				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info),
-						MediaType.APPLICATION_XML);
+				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
 				return;
 			} else {
 				// Async call
 				// We know here that urilistenerParam is not null...
 				urilistener = urilistenerParam.getValue();
 
-				ClientResources rcmal = getRestManager().getClientObjectKey(
-						Util.getPortFromUriListener(urilistener),
-						getClientInfo().getAddress());
+				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
 				proxyGalInterface = rcmal.getGatewayInterface();
-				rcmal.getClientEventListener().setGatewayStopDestination(
-						urilistener);
+				rcmal.getClientEventListener().setGatewayStopDestination(urilistener);
 				proxyGalInterface.stopNetwork(timeout);
 				Info.Detail detail = new Info.Detail();
 				Info infoToReturn = new Info();
@@ -437,8 +393,7 @@ public class StartupResource extends ServerResource {
 				infoToReturn.setStatus(status);
 				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
 				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn),
-						MediaType.TEXT_XML);
+				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
 				return;
 			}
 		} catch (Exception e1) {

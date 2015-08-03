@@ -31,21 +31,20 @@ import org.restlet.data.MediaType;
 import org.restlet.resource.Get;
 import org.restlet.resource.ServerResource;
 
-
 /**
-* Resource file used to manage the API GET:getChannelSync
-* 
-* @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
-*
-*/
+ * Resource file used to manage the API GET:getChannelSync
+ * 
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
+ */
 public class ChannelResource extends ServerResource {
 	private GatewayInterface proxyGalInterface = null;
 
 	@Get
 	public void represent() {
 		try {
-			proxyGalInterface = getRestManager().getClientObjectKey(-1,
-					getClientInfo().getAddress()).getGatewayInterface();
+			proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
 			Short _channel = proxyGalInterface.getChannelSync(INTERNAL_TIMEOUT);
 			Detail _det = new Detail();
 			_det.getValue().add(_channel.toString());
@@ -56,8 +55,7 @@ public class ChannelResource extends ServerResource {
 			_info.setDetail(_det);
 			getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
 			return;
-			
-			
+
 		} catch (NullPointerException npe) {
 			Info info = new Info();
 			Status _st = new Status();
@@ -67,7 +65,7 @@ public class ChannelResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 
 		} catch (Exception e) {
 			Info info = new Info();
@@ -78,7 +76,7 @@ public class ChannelResource extends ServerResource {
 			Info.Detail detail = new Info.Detail();
 			info.setDetail(detail);
 			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return ;
+			return;
 		}
 	}
 

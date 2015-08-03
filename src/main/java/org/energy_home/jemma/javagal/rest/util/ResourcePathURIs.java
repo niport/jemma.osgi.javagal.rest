@@ -18,8 +18,9 @@ package org.energy_home.jemma.javagal.rest.util;
 /**
  * Helper class that binds all available Rest resources with relative path uris.
  * 
- * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- *
+ * @author 
+ *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * 
  */
 public interface ResourcePathURIs {
 	public static final String VERSION = "/version";
@@ -38,8 +39,7 @@ public interface ResourcePathURIs {
 	public static final String LOCALNODE_SERVICES = LOCALNODE + SERVICES;
 	public static final String WSNCONNECTION = "/wsnconnection";
 	public static final String ALLSERVICES = "/allservices";
-	public static final String LOCALNODE_ALLSERVICES_WSNCONNECTION = LOCALNODE
-			+ ALLSERVICES + WSNCONNECTION;
+	public static final String LOCALNODE_ALLSERVICES_WSNCONNECTION = LOCALNODE + ALLSERVICES + WSNCONNECTION;
 	public static final String ALIASES = "/aliases";
 	public static final String WSNNODES = "/wsnnodes";
 	public static final String CHANNEL = "/channel";
@@ -73,7 +73,6 @@ public interface ResourcePathURIs {
 	public static final String REMOVE_CHILDREN = "remove-children";
 	public final static String FREQUENCY_AGILITY = "/frequencyagility";
 
-	public final static String URI_FREQUENCY_AGILITY = LOCALNODE
-			+ FREQUENCY_AGILITY;
+	public final static String URI_FREQUENCY_AGILITY = LOCALNODE + FREQUENCY_AGILITY;
 
 }
