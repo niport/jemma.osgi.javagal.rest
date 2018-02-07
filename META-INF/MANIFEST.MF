@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1517876722578
+Bnd-LastModified: 1517965759453
 Build-Jdk: 1.8.0_31
 Built-By: portinaro
 Bundle-Category: JEMMA JavaGAL, GUI
@@ -15,8 +15,9 @@ Import-Package: org.energy_home.jemma.zgd;version="[1.5,1.6)",org.slf4j;
  version="[1.6,2)",org.energy_home.jemma.zgd.jaxb;version="1.0.4",org.os
  gi.framework;version="[1.5,2)",com.sun.xml.internal.bind.marshaller;res
  olution:=optional,javax.xml.bind,javax.xml.namespace,javax.xml.transfor
- m,javax.xml.transform.stream,org.restlet,org.restlet.data,org.restlet.r
- epresentation,org.restlet.engine.header,org.restlet.resource,org.restle
- t.routing,org.restlet.util,org.osgi.util.tracker;version="1.4.2"
+ m.stream,org.restlet,org.restlet.data,org.restlet.representation,org.re
+ stlet.engine.header,org.restlet.resource,org.restlet.routing,org.restle
+ t.util
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Service-Component: OSGI-INF/*.xml
 Tool: Bnd-2.3.0.201405100607

@@ -23,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Internal dependencies version properties -->
-		<org.energy-home.jemma.osgi.javagal.version>2.0.10</org.energy-home.jemma.osgi.javagal.version>
+		<org.energy-home.jemma.zgd.version>1.0.0-SNAPSHOT</org.energy-home.jemma.zgd.version>
 
 		<!-- External dependencies version properties -->
 		<com.googlecode.jaxb-namespaceprefixmapper-interfaces>2.2.4</com.googlecode.jaxb-namespaceprefixmapper-interfaces>
@@ -77,11 +77,9 @@
 							org.slf4j;version="[1.6,2)",
 							org.energy_home.jemma.zgd.jaxb;version="1.0.4",
 							org.osgi.framework;version="[1.5,2)",
-							org.osgi.util.tracker;version="1.4.2",
 							com.sun.xml.internal.bind.marshaller;resolution:=optional,
 							javax.xml.bind,
 							javax.xml.namespace,
-							javax.xml.transform,
 							javax.xml.transform.stream,
 							org.restlet,
 							org.restlet.data,
@@ -93,6 +91,7 @@
 						</Import-Package>
 						<Export-Package></Export-Package>
 						<Embed-Dependency>org.restlet:org.restlet:2.1.6</Embed-Dependency>
+						<Service-Component>OSGI-INF/*.xml</Service-Component>
 						<Bundle-Category>JEMMA JavaGAL, GUI</Bundle-Category>
 					</instructions>
 				</configuration>
@@ -116,8 +115,8 @@
 		<!-- Internal dependencies -->
 		<dependency>
 			<groupId>org.energy-home</groupId>
-			<artifactId>jemma.osgi.javagal</artifactId>
-			<version>${org.energy-home.jemma.osgi.javagal.version}</version>
+			<artifactId>jemma.osgi.zgd.api</artifactId>
+			<version>${org.energy-home.jemma.zgd.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
