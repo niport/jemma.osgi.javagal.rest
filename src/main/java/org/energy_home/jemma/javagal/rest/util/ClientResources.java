@@ -17,22 +17,23 @@ package org.energy_home.jemma.javagal.rest.util;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.energy_home.jemma.javagal.rest.Activator;
 import org.energy_home.jemma.javagal.rest.PropertiesManager;
 import org.energy_home.jemma.javagal.rest.RestApsMessageListener;
-import org.energy_home.jemma.javagal.rest.RestMessageListener;
 import org.energy_home.jemma.javagal.rest.RestClientManagerAndListener;
 import org.energy_home.jemma.javagal.rest.RestManager;
-import org.energy_home.jemma.zgd.GalExtenderProxy;
+import org.energy_home.jemma.javagal.rest.RestMessageListener;
 import org.energy_home.jemma.zgd.GatewayInterface;
+import org.energy_home.jemma.zgd.IGalExtender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resource's class for a Rest client.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class ClientResources {
@@ -42,20 +43,21 @@ public class ClientResources {
 	/**
 	 * Creates a new instance.
 	 * 
-	 * @param _propertiesManager
-	 *            the properties manager.
-	 * @param _gatewayInterface
-	 *            the gateway interface.
-	 * @param _clientKey
-	 *            the client key object.
+	 * @param configuration
+	 *          the properties manager.
+	 * @param gatewayInterface
+	 *          the gateway interface.
+	 * @param clientKey
+	 *          the client key object.
 	 * @param _restManager
-	 *            the rest manager.
+	 *          the rest manager.
 	 */
-	public ClientResources(PropertiesManager _propertiesManager, GatewayInterface _gatewayInterface, ClientKey _clientKey, RestManager _restManager) {
-		this.gatewayInterface = _gatewayInterface;
-		this.propertiesManager = _propertiesManager;
+	public ClientResources(PropertiesManager configuration, GatewayInterface gatewayInterface, ClientKey clientKey,
+			RestManager _restManager) {
+		this.gatewayInterface = gatewayInterface;
+		this.propertiesManager = configuration;
 		this.restManager = _restManager;
-		this.clientKey = _clientKey;
+		this.clientKey = clientKey;
 	}
 
 	private static final Logger LOG = LoggerFactory.getLogger(ClientResources.class);
@@ -79,7 +81,7 @@ public class ClientResources {
 			if (propertiesManager.getDebugEnabled())
 				LOG.debug("Deleting Client...");
 			try {
-				((GalExtenderProxy) gatewayInterface).deleteProxy();
+				((IGalExtender) gatewayInterface).deleteProxy();
 				restManager.removeClientObjectKey(clientKey);
 
 			} catch (Exception e) {
@@ -122,7 +124,7 @@ public class ClientResources {
 	 * Sets the gateway interface associated to this client.
 	 * 
 	 * @param gatewayInterface
-	 *            the gateway interface to set.
+	 *          the gateway interface to set.
 	 */
 	public void setGatewayInterface(GatewayInterface gatewayInterface) {
 		this.gatewayInterface = gatewayInterface;
@@ -132,7 +134,7 @@ public class ClientResources {
 	 * Sets the map of callbacks event listeners.
 	 * 
 	 * @param callbacksEventListeners
-	 *            the map of callbacks event listeners to set.
+	 *          the map of callbacks event listeners to set.
 	 */
 	public void setmessageCallbacksEventListeners(ConcurrentHashMap<Long, RestMessageListener> callbacksEventListeners) {
 		this.messageCallbacksEventListeners = callbacksEventListeners;
@@ -142,7 +144,7 @@ public class ClientResources {
 	 * Sets the map of callbacks event listeners.
 	 * 
 	 * @param callbacksEventListeners
-	 *            the map of callbacks event listeners to set.
+	 *          the map of callbacks event listeners to set.
 	 */
 	public void setMessageApsCallbacksEventListeners(ConcurrentHashMap<Long, RestApsMessageListener> callbacksEventListeners) {
 		this.messageApscallbacksEventListeners = callbacksEventListeners;
@@ -161,7 +163,7 @@ public class ClientResources {
 	 * Sets the client event listener associated to this client.
 	 * 
 	 * @param clientEventListener
-	 *            the client event listener to set.
+	 *          the client event listener to set.
 	 */
 	public synchronized void setClientEventListener(RestClientManagerAndListener clientEventListener) {
 		this.clientEventListener = clientEventListener;

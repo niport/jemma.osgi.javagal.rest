@@ -23,8 +23,10 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 /**
  * Implementation for {@code NamespacePrefixMapper}.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {

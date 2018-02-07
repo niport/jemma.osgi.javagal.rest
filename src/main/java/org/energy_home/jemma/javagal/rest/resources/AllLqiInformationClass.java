@@ -16,13 +16,12 @@
 package org.energy_home.jemma.javagal.rest.resources;
 
 import org.energy_home.jemma.zgd.GatewayInterface;
-import org.energy_home.jemma.zgd.jaxb.Aliases;
-import org.energy_home.jemma.zgd.jaxb.Info;
 import org.energy_home.jemma.zgd.jaxb.Info.Detail;
+import org.energy_home.jemma.zgd.jaxb.LQIInformation;
 import org.restlet.resource.Get;
 
 /**
- * Resource file used to manage the API GET:listAddresses
+ * Resource file used to manage the API getLQIInformation.
  * 
  * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
  *         <marco.niedducv@gmail.com> from Consoft Sistemi
@@ -30,21 +29,19 @@ import org.restlet.resource.Get;
  *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class ListAddressesResource extends CommonResource {
+public class AllLqiInformationClass extends CommonResource {
 
-	private GatewayInterface proxyGalInterface = null;
+	private GatewayInterface proxyGalInterface;
 
 	@Get
-	public void represent() {
+	public void processGet() {
 		try {
 			proxyGalInterface = getGatewayInterface();
-			Aliases aliases = proxyGalInterface.listAddresses();
-			Detail details = new Info.Detail();
-			details.setAliases(aliases);
+			LQIInformation lqi = proxyGalInterface.getLQIInformation();
+			Detail details = new Detail();
+			details.getLQIInformation().add(lqi);
 
 			sendResult(details);
-		} catch (NullPointerException e) {
-			generalError(e.getMessage());
 		} catch (Exception e) {
 			generalError(e.getMessage());
 		}

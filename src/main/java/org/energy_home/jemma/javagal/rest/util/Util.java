@@ -34,8 +34,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class Util {
@@ -66,12 +68,12 @@ public class Util {
 	 * Unmarshal class.
 	 * 
 	 * @param content
-	 *            the string containing the text to unmarshal.
+	 *          the string containing the text to unmarshal.
 	 * @param clasz
-	 *            the class resulting from the unmarshal process.
+	 *          the class resulting from the unmarshal process.
 	 * @return the unmarshalled object.
 	 * @throws Exception
-	 *             if an error occurs.
+	 *           if an error occurs.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	synchronized public static <T> T unmarshal(String content, Class<T> clasz) throws Exception {
@@ -91,7 +93,7 @@ public class Util {
 	 * Marshal class.
 	 * 
 	 * @param o
-	 *            the object to marshall.
+	 *          the object to marshall.
 	 * 
 	 * @return the marshalled representation.
 	 */
@@ -128,39 +130,36 @@ public class Util {
 	}
 
 	/**
-	 * Tells if the value contained in a candidate Long is actually an unsigned
-	 * 8 bits value or not (1 byte).
+	 * Tells if the value contained in a candidate Long is actually an unsigned 8
+	 * bits value or not (1 byte).
 	 * 
 	 * @param candidate
-	 *            the candidate Long.
-	 * @return true if the value is actually an unsigned 8 bits, false
-	 *         otherwise.
+	 *          the candidate Long.
+	 * @return true if the value is actually an unsigned 8 bits, false otherwise.
 	 */
 	synchronized public static boolean isUnsigned8(Long candidate) {
 		return ((candidate >= 0) && (candidate <= unsigned8MaxValue));
 	}
 
 	/**
-	 * Tells if the value contained in a candidate Long is actually an unsigned
-	 * 16 bits value or not (2 bytes).
+	 * Tells if the value contained in a candidate Long is actually an unsigned 16
+	 * bits value or not (2 bytes).
 	 * 
 	 * @param candidate
-	 *            the candidate Long.
-	 * @return true if the value is actually an unsigned 16 bits, false
-	 *         otherwise.
+	 *          the candidate Long.
+	 * @return true if the value is actually an unsigned 16 bits, false otherwise.
 	 */
 	synchronized public static boolean isUnsigned16(Long candidate) {
 		return ((candidate >= 0) && (candidate <= unsigned16MaxValue));
 	}
 
 	/**
-	 * Tells if the value contained in a candidate Long is actually an unsigned
-	 * 32 bits value or not (4 bytes).
+	 * Tells if the value contained in a candidate Long is actually an unsigned 32
+	 * bits value or not (4 bytes).
 	 * 
 	 * @param candidate
-	 *            the candidate Long.
-	 * @return true if the value is actually an unsigned 32 bits, false
-	 *         otherwise.
+	 *          the candidate Long.
+	 * @return true if the value is actually an unsigned 32 bits, false otherwise.
 	 */
 	synchronized public static boolean isUnsigned32(Long candidate) {
 		return ((candidate >= 0) && (candidate <= unsigned32MaxValue));
@@ -182,7 +181,7 @@ public class Util {
 	 * Extract the port number from a given uri.
 	 * 
 	 * @param Uri
-	 *            the uri.
+	 *          the uri.
 	 * @return the extracted port number.
 	 */
 	public static int getPortFromUriListener(String Uri) {

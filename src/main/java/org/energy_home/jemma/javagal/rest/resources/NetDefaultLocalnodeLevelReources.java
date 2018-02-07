@@ -15,37 +15,30 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import org.energy_home.jemma.javagal.rest.util.Resources;
-import org.energy_home.jemma.javagal.rest.util.Util;
-import org.energy_home.jemma.zgd.GatewayConstants;
-import org.energy_home.jemma.zgd.jaxb.Info;
+import org.energy_home.jemma.javagal.rest.util.ResourcePathURIs;
 import org.energy_home.jemma.zgd.jaxb.Info.Detail;
-import org.energy_home.jemma.zgd.jaxb.Status;
-import org.restlet.data.MediaType;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API GET:URL menu.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class netLevelReources extends ServerResource {
+public class NetDefaultLocalnodeLevelReources extends CommonResource {
 
 	@Get
 	public void represent() {
-		Detail _det = new Detail();
-		Info _info = new Info();
-		Status _st = new Status();
-		_st.setCode((short) GatewayConstants.SUCCESS);
-		_info.setStatus(_st);
-		_det.getValue().add(Resources.NET_DEFAULT_ROOT_URI);
-		_info.setDetail(_det);
+		Detail details = new Detail();
 
-		getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
-		return;
+		details.getValue().add(ResourcePathURIs.SERVICES);
+		details.getValue().add(ResourcePathURIs.ALLSERVICES);
+		details.getValue().add(ResourcePathURIs.NODEDESCRIPTOR);
+		details.getValue().add(ResourcePathURIs.FREQUENCY_AGILITY);
 
+		sendResult(details);
 	}
 }

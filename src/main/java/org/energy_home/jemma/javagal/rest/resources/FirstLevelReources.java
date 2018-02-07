@@ -15,14 +15,13 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import org.energy_home.jemma.zgd.GatewayInterface;
-import org.energy_home.jemma.zgd.jaxb.Aliases;
-import org.energy_home.jemma.zgd.jaxb.Info;
+import org.energy_home.jemma.javagal.rest.util.ResourcePathURIs;
+import org.energy_home.jemma.javagal.rest.util.Resources;
 import org.energy_home.jemma.zgd.jaxb.Info.Detail;
 import org.restlet.resource.Get;
 
 /**
- * Resource file used to manage the API GET:listAddresses
+ * Resource file used to manage the URL menu
  * 
  * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
  *         <marco.niedducv@gmail.com> from Consoft Sistemi
@@ -30,23 +29,17 @@ import org.restlet.resource.Get;
  *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class ListAddressesResource extends CommonResource {
-
-	private GatewayInterface proxyGalInterface = null;
+public class FirstLevelReources extends CommonResource {
 
 	@Get
 	public void represent() {
-		try {
-			proxyGalInterface = getGatewayInterface();
-			Aliases aliases = proxyGalInterface.listAddresses();
-			Detail details = new Info.Detail();
-			details.setAliases(aliases);
+		Detail details = new Detail();
+		details.getValue().add(ResourcePathURIs.VERSION);
+		details.getValue().add(ResourcePathURIs.RESET);
+		details.getValue().add(ResourcePathURIs.STARTUP);
+		details.getValue().add(Resources.NET_ROOT_URI);
 
-			sendResult(details);
-		} catch (NullPointerException e) {
-			generalError(e.getMessage());
-		} catch (Exception e) {
-			generalError(e.getMessage());
-		}
+		sendResult(details);
+		return;
 	}
 }

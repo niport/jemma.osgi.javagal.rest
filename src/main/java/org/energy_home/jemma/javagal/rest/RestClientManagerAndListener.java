@@ -27,7 +27,6 @@ import org.energy_home.jemma.zgd.GatewayEventListenerExtended;
 import org.energy_home.jemma.zgd.jaxb.Address;
 import org.energy_home.jemma.zgd.jaxb.BindingList;
 import org.energy_home.jemma.zgd.jaxb.Info;
-import org.energy_home.jemma.zgd.jaxb.InterPANMessage;
 import org.energy_home.jemma.zgd.jaxb.InterPANMessageEvent;
 import org.energy_home.jemma.zgd.jaxb.NodeDescriptor;
 import org.energy_home.jemma.zgd.jaxb.NodeServices;
@@ -45,12 +44,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@code GatewayEventListenerExtended} for the Rest server.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class RestClientManagerAndListener implements GatewayEventListenerExtended {
+
+	private static final Logger LOG = LoggerFactory.getLogger(RestClientManagerAndListener.class);
+
 	private ExecutorService executor = null;
+
 	private String bindingDestination;
 	private String gatewayStopDestination;
 	private String leaveResultDestination;
@@ -69,686 +74,644 @@ public class RestClientManagerAndListener implements GatewayEventListenerExtende
 	private String interPANCommandDestination;
 	private String frequencyAgilityResultDestination;
 	private final Context context;
-	private static final Logger LOG = LoggerFactory.getLogger(RestClientManagerAndListener.class);
-	private PropertiesManager _PropertiesManager;
+
+	private PropertiesManager configuration;
 	private ClientResources clientResource;
 
-	public RestClientManagerAndListener(PropertiesManager ___PropertiesManager, ClientResources _clientResorce) {
-		_PropertiesManager = ___PropertiesManager;
+	public RestClientManagerAndListener(PropertiesManager configuration, ClientResources _clientResorce) {
+		this.configuration = configuration;
 		this.clientResource = _clientResorce;
 		this.context = new Context();
-		context.getParameters().add("socketTimeout", ((Integer) (_PropertiesManager.getHttpOptTimeout() * 1000)).toString());
-		executor = Executors.newFixedThreadPool(_PropertiesManager.getNumberOfThreadForAnyPool(), new ThreadFactory() {
 
+		context.getParameters().add("socketTimeout", ((Integer) (configuration.getHttpOptTimeout() * 1000)).toString());
+
+		executor = Executors.newFixedThreadPool(configuration.getNumberOfThreadForAnyPool(), new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
-
 				return new Thread(r, "THPool-RestClientManagerAndListener");
 			}
 		});
 
 		if (executor instanceof ThreadPoolExecutor) {
-			((ThreadPoolExecutor) executor).setKeepAliveTime(_PropertiesManager.getKeepAliveThread(), TimeUnit.MINUTES);
+			((ThreadPoolExecutor) executor).setKeepAliveTime(configuration.getKeepAliveThread(), TimeUnit.MINUTES);
 			((ThreadPoolExecutor) executor).allowCoreThreadTimeOut(true);
-
 		}
+	}
+
+	private boolean isEmpty(String s) {
+		return s.equals("");
+	}
+
+	protected void postResource(ClientResource resource, Info.Detail detail) {
+		this.postResource(resource, detail, null);
+	}
+
+	protected void postResource(ClientResource resource, Status status) {
+		this.postResource(resource, null, status);
+	}
+
+	protected void postResource(ClientResource resource, Info.Detail detail, Status status) {
+		Info info = new Info();
+		if (status != null) {
+			info.setStatus(status);
+		}
+
+		if (detail == null) {
+			detail = new Info.Detail();
+		}
+
+		info.setDetail(detail);
+		String xml = Util.marshal(info);
+		if (configuration.getDebugEnabled()) {
+			LOG.debug("Marshaled: " + xml);
+		}
+		resource.post(xml, MediaType.TEXT_XML);
 	}
 
 	synchronized public void gatewayStartResult(final Status status) {
 
-		if ((startGatewayDestination != null) && !startGatewayDestination.equals("")) {
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + startGatewayDestination);
-						ClientResource resource = new ClientResource(context, startGatewayDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled:" + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on gatewayStartResult", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-
-			});
+		if (isEmpty(startGatewayDestination)) {
+			return;
 		}
+
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + startGatewayDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, startGatewayDestination);
+
+					postResource(resource, status);
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on gatewayStartResult", e);
+					}
+					clientResource.addToCounterException();
+				}
+			}
+		});
 
 	}
 
 	public void nodeDiscovered(final Status status, final WSNNode node) {
 
-		if ((nodeDiscoveredDestination != null) && !nodeDiscoveredDestination.equals("")) {
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + nodeDiscoveredDestination);
-
-						ClientResource resource = new ClientResource(context, nodeDiscoveredDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setWSNNode(node);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(nodeDiscoveredDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + nodeDiscoveredDestination);
+
+					ClientResource resource = new ClientResource(context, nodeDiscoveredDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setWSNNode(node);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void nodeRemoved(final Status status, final WSNNode node) {
-
-		if ((nodeRemovedDestination != null) && !nodeRemovedDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + nodeRemovedDestination);
-
-						ClientResource resource = new ClientResource(context, nodeRemovedDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setWSNNode(node);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(nodeRemovedDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + nodeRemovedDestination);
+
+					ClientResource resource = new ClientResource(context, nodeRemovedDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setWSNNode(node);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void servicesDiscovered(final Status status, final NodeServices services) {
 
-		if ((nodeServicesDestination != null) && !nodeServicesDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + nodeServicesDestination);
-
-						ClientResource resource = new ClientResource(context, nodeServicesDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setNodeServices(services);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(nodeServicesDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + nodeServicesDestination);
+					}
+					ClientResource resource = new ClientResource(context, nodeServicesDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setNodeServices(services);
+					postResource(resource, detail, status);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void serviceDescriptorRetrieved(final Status status, final ServiceDescriptor service) {
 
-		if ((serviceDescriptorDestination != null) && !serviceDescriptorDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + serviceDescriptorDestination);
-
-						ClientResource resource = new ClientResource(context, serviceDescriptorDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setServiceDescriptor(service);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(serviceDescriptorDestination)) {
+			return;
 		}
+
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + serviceDescriptorDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, serviceDescriptorDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setServiceDescriptor(service);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+					clientResource.addToCounterException();
+				}
+			}
+		});
 
 	}
 
 	public void dongleResetResult(final Status status) {
 
-		if ((resetDestination != null) && !resetDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + resetDestination);
-
-						ClientResource resource = new ClientResource(context, resetDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(resetDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + resetDestination);
+
+					ClientResource resource = new ClientResource(context, resetDestination);
+
+					postResource(resource, status);
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void bindingResult(final Status status) {
 
-		if ((bindingDestination != null) && !bindingDestination.equals("")) {
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + bindingDestination);
-						ClientResource resource = new ClientResource(context, bindingDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
-
+		if (isEmpty(bindingDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + bindingDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, bindingDestination);
+
+					postResource(resource, status);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void unbindingResult(final Status status) {
 
-		if ((unbindingDestination != null) && !unbindingDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + unbindingDestination);
-
-						ClientResource resource = new ClientResource(context, unbindingDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(unbindingDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + unbindingDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, unbindingDestination);
+
+					postResource(resource, status);
+
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void nodeBindingsRetrieved(final Status status, final BindingList bindings) {
 
-		if ((nodeBindingDestination != null) && !nodeBindingDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + nodeBindingDestination);
-
-						ClientResource resource = new ClientResource(context, nodeBindingDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setBindings(bindings);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(nodeBindingDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + nodeBindingDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, nodeBindingDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setBindings(bindings);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void leaveResult(final Status status) {
 
-		if ((leaveResultDestination != null) && !leaveResultDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + leaveResultDestination);
-
-						ClientResource resource = new ClientResource(context, leaveResultDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
-
+		if (isEmpty(leaveResultDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + leaveResultDestination);
+
+					ClientResource resource = new ClientResource(context, leaveResultDestination);
+					postResource(resource, status);
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void permitJoinResult(final Status status) {
 
-		if ((permitJoinDestination != null) && !permitJoinDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + permitJoinDestination);
-
-						ClientResource resource = new ClientResource(context, permitJoinDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
-
+		if (isEmpty(permitJoinDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + permitJoinDestination);
+
+					ClientResource resource = new ClientResource(context, permitJoinDestination);
+					postResource(resource, status);
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
-	public void nodeDescriptorRetrievedExtended(final Status status, final NodeDescriptor node, final Address addressOfInteres) {
+	public void nodeDescriptorRetrievedExtended(final Status status, final NodeDescriptor node, final Address addressOfInterest) {
 
-		if ((nodeDescriptorDestination != null) && !nodeDescriptorDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + nodeDescriptorDestination);
-
-						ClientResource resource = new ClientResource(context, nodeDescriptorDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setNodeDescriptor(node);
-						WSNNode n = new WSNNode();
-						n.setAddress(addressOfInteres);
-						detail.setWSNNode(n);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(nodeDescriptorDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + nodeDescriptorDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, nodeDescriptorDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setNodeDescriptor(node);
+					WSNNode n = new WSNNode();
+					n.setAddress(addressOfInterest);
+					detail.setWSNNode(n);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	@Deprecated
 	public void nodeDescriptorRetrieved(final Status status, final NodeDescriptor node) {
 
-		if ((nodeDescriptorDestination != null) && !nodeDescriptorDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + nodeDescriptorDestination);
-
-						ClientResource resource = new ClientResource(context, nodeDescriptorDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						detail.setNodeDescriptor(node);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(nodeDescriptorDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + nodeDescriptorDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, nodeDescriptorDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setNodeDescriptor(node);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void gatewayStopResult(final Status status) {
 
-		if ((gatewayStopDestination != null) && !gatewayStopDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + gatewayStopDestination);
-
-						ClientResource resource = new ClientResource(context, gatewayStopDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(gatewayStopDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + gatewayStopDestination);
+
+					ClientResource resource = new ClientResource(context, gatewayStopDestination);
+
+					postResource(resource, status);
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
-	public void leaveResultExtended(final Status status, final Address addressOfInteres) {
+	public void leaveResultExtended(final Status status, final Address addressOfInterest) {
 
-		if ((leaveResultDestination != null) && !leaveResultDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + leaveResultDestination);
-
-						ClientResource resource = new ClientResource(context, leaveResultDestination);
-						Info info = new Info();
-						info.setStatus(status);
-						Info.Detail detail = new Info.Detail();
-						WSNNode node = new WSNNode();
-						node.setAddress(addressOfInteres);
-						detail.setWSNNode(node);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
-
+		if (isEmpty(leaveResultDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + leaveResultDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, leaveResultDestination);
+
+					Info.Detail detail = new Info.Detail();
+					WSNNode node = new WSNNode();
+					node.setAddress(addressOfInterest);
+					detail.setWSNNode(node);
+
+					postResource(resource, detail, status);
+
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void notifyZDPCommand(final ZDPMessage message) {
 
-		if ((zdpCommandDestination != null) && !zdpCommandDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + zdpCommandDestination);
-
-						ClientResource resource = new ClientResource(context, zdpCommandDestination);
-						Info.Detail detail = new Info.Detail();
-						detail.setZDPMessage(message);
-						String _xml = Util.marshal(detail);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
-
+		if (isEmpty(zdpCommandDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + zdpCommandDestination);
+
+					ClientResource resource = new ClientResource(context, zdpCommandDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setZDPMessage(message);
+
+					postResource(resource, detail);
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void notifyInterPANCommand(final InterPANMessageEvent message) {
 
-		if ((interPANCommandDestination != null) && !interPANCommandDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.info("Connecting to:" + interPANCommandDestination);
-
-						ClientResource resource = new ClientResource(context, interPANCommandDestination);
-						Info.Detail detail = new Info.Detail();
-						detail.setInterPANMessageEvent(message);
-						String _xml = Util.marshal(detail);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.info(_xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error(e.getMessage(), e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
-
+		if (isEmpty(interPANCommandDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.info("Connecting to:" + interPANCommandDestination);
+
+					ClientResource resource = new ClientResource(context, interPANCommandDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setInterPANMessageEvent(message);
+
+					postResource(resource, detail);
+
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error(e.getMessage(), e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public void notifyZCLCommand(final ZCLMessage message) {
 
-		if ((zclCommandDestination != null) && !zclCommandDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + zclCommandDestination);
-
-						ClientResource resource = new ClientResource(context, zclCommandDestination);
-						Info.Detail detail = new Info.Detail();
-						detail.setZCLMessage(message);
-						String _xml = Util.marshal(detail);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(zclCommandDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled())
+						LOG.debug("Connecting to:" + zclCommandDestination);
+
+					ClientResource resource = new ClientResource(context, zclCommandDestination);
+
+					Info.Detail detail = new Info.Detail();
+					detail.setZCLMessage(message);
+					postResource(resource, detail);
+
+					resource.release();
+
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled())
+						LOG.error("Exception on ??", e);
+
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
-	public void FrequencyAgilityResponse(final Status _st) {
+	public void frequencyAgilityResponse(final Status status) {
 
-		if ((frequencyAgilityResultDestination != null) && !frequencyAgilityResultDestination.equals("")) {
-
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Connecting to:" + frequencyAgilityResultDestination);
-						ClientResource resource = new ClientResource(context, frequencyAgilityResultDestination);
-						Info info = new Info();
-						info.setStatus(_st);
-						Info.Detail detail = new Info.Detail();
-						// detail.setEnergyScanResult(_result);
-						info.setDetail(detail);
-						String _xml = Util.marshal(info);
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.debug("Marshaled: " + _xml);
-						resource.post(_xml, MediaType.TEXT_XML);
-						resource.release();
-						resource = null;
-						clientResource.resetCounter();
-					} catch (Exception e) {
-						if (_PropertiesManager.getDebugEnabled())
-							LOG.error("Exception on ??", e);
-
-						clientResource.addToCounterException();
-					}
-				}
-			});
+		if (isEmpty(frequencyAgilityResultDestination)) {
+			return;
 		}
 
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					if (configuration.getDebugEnabled()) {
+						LOG.debug("Connecting to:" + frequencyAgilityResultDestination);
+					}
+
+					ClientResource resource = new ClientResource(context, frequencyAgilityResultDestination);
+					postResource(resource, status);
+
+					resource.release();
+					clientResource.resetCounter();
+				} catch (Exception e) {
+					if (configuration.getDebugEnabled()) {
+						LOG.error("Exception on ??", e);
+					}
+					clientResource.addToCounterException();
+				}
+			}
+		});
 	}
 
 	public String getGatewayStopDestination() {
@@ -886,5 +849,4 @@ public class RestClientManagerAndListener implements GatewayEventListenerExtende
 	public void setNodeBindingDestination(String nodeBindingDestination) {
 		this.nodeBindingDestination = nodeBindingDestination;
 	}
-
 }

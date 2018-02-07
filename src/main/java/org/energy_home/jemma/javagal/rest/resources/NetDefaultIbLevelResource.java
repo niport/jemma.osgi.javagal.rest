@@ -15,14 +15,11 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import org.energy_home.jemma.zgd.GatewayInterface;
-import org.energy_home.jemma.zgd.jaxb.Aliases;
-import org.energy_home.jemma.zgd.jaxb.Info;
 import org.energy_home.jemma.zgd.jaxb.Info.Detail;
 import org.restlet.resource.Get;
 
 /**
- * Resource file used to manage the API GET:listAddresses
+ * Resource file used to manage the API GET:URL menu.
  * 
  * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
  *         <marco.niedducv@gmail.com> from Consoft Sistemi
@@ -30,23 +27,25 @@ import org.restlet.resource.Get;
  *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class ListAddressesResource extends CommonResource {
-
-	private GatewayInterface proxyGalInterface = null;
+public class NetDefaultIbLevelResource extends CommonResource {
 
 	@Get
 	public void represent() {
-		try {
-			proxyGalInterface = getGatewayInterface();
-			Aliases aliases = proxyGalInterface.listAddresses();
-			Detail details = new Info.Detail();
-			details.setAliases(aliases);
+		Detail details = new Detail();
+		details.getValue()
+				.add("a1 - nwkSecurityMaterialSet (The two entries for the security material set, does not includes incoming counters.)");
+		details.getValue().add("c3 - apsChannelMask (Mask of channels to form/join)");
+		details.getValue().add("c4 - apsUseExtendedPANID (Extended PAN ID)");
+		details.getValue().add("c8 - apsUseInsecureJoin (Use secure or insecure join)");
+		details.getValue().add("80 - nwkPanId (The PAN Identifier for the PAN of which the device is amember.)");
+		details.getValue().add("9A - nwkExtendedPANID (The Extended PAN Identifier for the PAN of which the device is a member.)");
+		details.getValue().add("A0 - nwkSecurityLevel");
+		details.getValue().add("96 - nwkShortAddress");
+		details.getValue().add("DA - nwkDeviceType");
+		details.getValue().add("DB - nwkSoftwareVersion");
+		details.getValue().add("E6 - SASNwkKey");
+		// _det.getValue().add("85 - MacKey");
 
-			sendResult(details);
-		} catch (NullPointerException e) {
-			generalError(e.getMessage());
-		} catch (Exception e) {
-			generalError(e.getMessage());
-		}
+		sendResult(details);
 	}
 }

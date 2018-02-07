@@ -18,8 +18,10 @@ package org.energy_home.jemma.javagal.rest.util;
 /**
  * Helper class that binds all available Rest resources with relative path uris.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public interface ResourcePathURIs {
@@ -56,7 +58,7 @@ public interface ResourcePathURIs {
 	public static final String SEND_APSMESSAGE = WSNCONNECTION + APSMESSAGE;
 
 	public static final String MODE_CACHE = "mode=cache";
-	public static final String URILISTENER_PARAM = "urilistener=";
+	public static final String URILISTENER_PARAM = "uriListener=";
 	public static final String TIMEOUT_PARAM = "timeout=";
 	public static final String INFINITE_TIMEOUT = "ffffffff";
 	public static final String INDEX_PARAM = "index=";

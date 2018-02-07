@@ -15,28 +15,21 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import org.energy_home.jemma.zgd.GatewayConstants;
 import org.energy_home.jemma.zgd.GatewayInterface;
-import org.energy_home.jemma.zgd.jaxb.Info;
-import org.energy_home.jemma.zgd.jaxb.Status;
-import org.energy_home.jemma.zgd.jaxb.Version;
 import org.energy_home.jemma.zgd.jaxb.Info.Detail;
-
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestManager;
-import org.energy_home.jemma.javagal.rest.util.Util;
-import org.restlet.data.MediaType;
+import org.energy_home.jemma.zgd.jaxb.Version;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API GET:getVersion
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class GetVersionResource extends ServerResource {
+public class GetVersionResource extends CommonResource {
 
 	private GatewayInterface proxyGalInterface = null;
 
@@ -44,51 +37,18 @@ public class GetVersionResource extends ServerResource {
 	public void represent() {
 
 		try {
-			proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+			proxyGalInterface = getGatewayInterface();
 			Version version = proxyGalInterface.getVersion();
 
-			Detail _det = new Detail();
-			_det.setVersion(version);
+			Detail details = new Detail();
+			details.setVersion(version);
 
-			Info _info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.SUCCESS);
-			_info.setStatus(_st);
+			sendResult(details);
 
-			_info.setDetail(_det);
-			getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
-			return;
-
-		} catch (NullPointerException npe) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(npe.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-
+		} catch (NullPointerException e) {
+			generalError(e.getMessage());
 		} catch (Exception e) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(e.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+			generalError(e.getMessage());
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }

@@ -18,8 +18,10 @@ package org.energy_home.jemma.javagal.rest.util;
 /**
  * Resources class.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class Resources {
@@ -39,15 +41,18 @@ public class Resources {
 	public static String NWT_ROOT_URI = GW_ROOT_URI + NET_ROOT_URI + NET_DEFAULT_ROOT_URI;
 
 	/*
-	 * URIs
+	 * Parameter names
 	 */
-	public final static String URI_PARAM_URILISTENER = "urilistener";
+	public final static String URI_PARAM_URILISTENER = "uriListener";
 	public final static String URI_PARAM_TIMEOUT = "timeout";
 	public final static String URI_PARAM_START = "start";
 	public final static String URI_PARAM_INDEX = "index";
 	public final static String URI_PARAM_MODE = "mode";
 	public final static String URI_PARAM_CACHE = "cache";
 
+	/*
+	 * URIs
+	 */
 	public final static String URI_ID = "/{id}";
 	public final static String URI_ADDR = "/{addr}";
 	public final static String URI_ENDPOINT = "/{ep}";

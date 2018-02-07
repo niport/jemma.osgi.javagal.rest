@@ -17,40 +17,35 @@ package org.energy_home.jemma.javagal.rest.resources;
 
 import java.math.BigInteger;
 
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestManager;
 import org.energy_home.jemma.javagal.rest.util.ClientResources;
 import org.energy_home.jemma.javagal.rest.util.ResourcePathURIs;
 import org.energy_home.jemma.javagal.rest.util.Resources;
 import org.energy_home.jemma.javagal.rest.util.Util;
-import org.energy_home.jemma.zgd.GatewayConstants;
 import org.energy_home.jemma.zgd.GatewayInterface;
 import org.energy_home.jemma.zgd.jaxb.Address;
-import org.energy_home.jemma.zgd.jaxb.Info;
-import org.energy_home.jemma.zgd.jaxb.InterPANMessage;
-import org.energy_home.jemma.zgd.jaxb.InterPANMessageResult;
 import org.energy_home.jemma.zgd.jaxb.Info.Detail;
+import org.energy_home.jemma.zgd.jaxb.InterPANMessage;
 import org.energy_home.jemma.zgd.jaxb.Status;
 import org.energy_home.jemma.zgd.jaxb.ZDPCommand;
-import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
 import org.restlet.engine.header.Header;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Options;
 import org.restlet.resource.Post;
-import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
 
 /**
  * Resource file used to manage the API GET:URL menu. POST:sendZDPCommand.
  * DELETE:deleteCallBack
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
+public class SendZdpAndInterPANAndLeaveResource extends CommonResource {
 
 	private GatewayInterface proxyGalInterface;
 
@@ -69,34 +64,23 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 
 	@Get
 	public void processGet() {
-		Detail _det = new Detail();
-		Info _info = new Info();
-		Status _st = new Status();
-		_st.setCode((short) GatewayConstants.SUCCESS);
-		_info.setStatus(_st);
-		_det.getValue().add(ResourcePathURIs.BINDINGS);
-		_det.getValue().add(ResourcePathURIs.UNBINDINGS);
-		_det.getValue().add(ResourcePathURIs.NODEDESCRIPTOR);
-		_det.getValue().add(ResourcePathURIs.SERVICES);
-		_det.getValue().add(ResourcePathURIs.PERMIT_JOIN);
-		_det.getValue().add(ResourcePathURIs.LQIINFORMATION);
-		_info.setDetail(_det);
+		Detail details = new Detail();
+		details.getValue().add(ResourcePathURIs.BINDINGS);
+		details.getValue().add(ResourcePathURIs.UNBINDINGS);
+		details.getValue().add(ResourcePathURIs.NODEDESCRIPTOR);
+		details.getValue().add(ResourcePathURIs.SERVICES);
+		details.getValue().add(ResourcePathURIs.PERMIT_JOIN);
+		details.getValue().add(ResourcePathURIs.LQIINFORMATION);
 
-		getResponse().setEntity(Util.marshal(_info), MediaType.TEXT_XML);
-		return;
-
+		sendResult(details);
 	}
 
 	@Post
 	public void processPost(String body) {
 
-		// Uri parameters check
-		String timeoutString = null;
-		String urilistener = null;
-		String aoiString = null; // Note aoiString is correct even if we read
-									// the addr parameter and we call it aoi
-		Long timeout = -1l;
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
+		long timeout = getLongParameter(Resources.URI_PARAM_TIMEOUT, true, -1);
+		Address address = this.getAddressAttribute("addr");
+		String uriListener = this.getStringParameter(Resources.URI_PARAM_URILISTENER, null);
 
 		Series<Header> responseHeaders = (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
 		if (responseHeaders == null) {
@@ -105,78 +89,6 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 		}
 		// allow request from other origins
 		responseHeaders.add(new Header("Access-Control-Allow-Origin", "*"));
-
-		if (timeoutParam == null) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-		} else {
-			timeoutString = timeoutParam.getValue().trim();
-			try {
-				timeout = Long.decode("0x" + timeoutString);
-				// if (timeout < 0 || timeout > 0xffffffff) {
-				if (!Util.isUnsigned32(timeout)) {
-
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
-
-				}
-			} catch (NumberFormatException nfe) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			}
-		}
-
-		aoiString = (String) getRequest().getAttributes().get(Resources.PARAMETER_ADDR);
-
-		if (aoiString == null) {
-
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: " + Resources.URI_ADDR + " missing.");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-
-		}
-
-		Address address = new Address();
-		if (aoiString.length() > 4) {
-			// IEEEAddress
-			BigInteger ieee = new BigInteger(aoiString, 16);
-			address.setIeeeAddress(ieee);
-		} else {
-			// ShortAddress
-			Integer shortAddress = new Integer(Integer.parseInt(aoiString, 16));
-			address.setNetworkAddress(shortAddress);
-		}
-
-		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
 
 		ZDPCommand zdpCommand = null;
 
@@ -195,114 +107,57 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 		}
 
 		if (interPANMessage != null) {
-
 			// It's a Send InterPan message invocation
 			try {
-				if (urilistenerParam == null) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Sync call because urilistener not present. Not implemented. Only asynch is admitted");
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				if (uriListener == null) {
+					generalError("Sync call because uriListener not present. Not implemented. Only asynch is admitted");
 					return;
 				} else {
-					urilistener = urilistenerParam.getValue();
-					ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-					proxyGalInterface = rcmal.getGatewayInterface();
-					if (rcmal.getClientEventListener() != null)
-						rcmal.getClientEventListener().setInterPANCommandDestination(urilistener);
+					ClientResources client = getClientResources(uriListener);
+
+					proxyGalInterface = client.getGatewayInterface();
+					if (client.getClientEventListener() != null)
+						client.getClientEventListener().setInterPANCommandDestination(uriListener);
 					proxyGalInterface.sendInterPANMessage(timeout, interPANMessage);
-					Info.Detail detail = new Info.Detail();
-					Info infoToReturn = new Info();
-					Status status = new Status();
-					status.setCode((short) GatewayConstants.SUCCESS);
-					infoToReturn.setStatus(status);
-					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+
+					sendSuccess();
 					return;
 				}
-			} catch (Exception e1) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(e1.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+			} catch (Exception e) {
+				generalError(e.getMessage());
 				return;
 			}
-
-		}
-
-		else if (zdpCommand != null) {
+		} else if (zdpCommand != null) {
 
 			// It's a Send Zdp Message message invocation
 			try {
-				if (urilistenerParam == null) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Sync call because urilistener not present. Not implemented. Only asynch is admitted");
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				if (uriListener == null) {
+					generalError("Sync call because uriListener not present. Not implemented. Only asynch is admitted");
 					return;
 				} else {
-					urilistener = urilistenerParam.getValue();
-					ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-					proxyGalInterface = rcmal.getGatewayInterface();
-					if (rcmal.getClientEventListener() != null)
-						rcmal.getClientEventListener().setZdpCommandDestination(urilistener);
+					ClientResources client = getClientResources(uriListener);
+					proxyGalInterface = client.getGatewayInterface();
+					if (client.getClientEventListener() != null) {
+						client.getClientEventListener().setZdpCommandDestination(uriListener);
+					}
 					proxyGalInterface.sendZDPCommand(timeout, zdpCommand);
-					Info.Detail detail = new Info.Detail();
-					Info infoToReturn = new Info();
-					Status status = new Status();
-					status.setCode((short) GatewayConstants.SUCCESS);
-					infoToReturn.setStatus(status);
-					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-					return;
+
+					sendSuccess();
 				}
-			} catch (Exception e1) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(e1.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
+			} catch (Exception e) {
+				generalError(e.getMessage());
 			}
-
 		} else {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Wrong xml");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+			generalError("Wrong xml");
 		}
-
 	}
 
 	@Delete
 	public void processDelete() {
 		Address address = new Address();
 
-		String timeoutString = null;
-		String urilistener = null;
-		Long timeout = -1l;
+		String uriListener = null;
+
 		// addrString parameters check
 		String addrString = (String) getRequest().getAttributes().get(Resources.PARAMETER_ADDR);
 		if (addrString != null) {
@@ -316,134 +171,54 @@ public class SendZdpAndInterPANAndLeaveResource extends ServerResource {
 				address.setNetworkAddress(shortAddress);
 			}
 		} else {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.PARAMETER_ADDR + "' parameter's value invalid. You provided: " + addrString);
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+			generalError("Error: mandatory '" + Resources.PARAMETER_ADDR + "' parameter's value invalid. You provided: " + addrString);
 			return;
-
 		}
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-		if (timeoutParam == null) {
-
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's not present");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+		long timeout;
+		try {
+			timeout = getLongParameter(Resources.URI_PARAM_TIMEOUT, true, -1);
+		} catch (IllegalArgumentException e) {
+			generalError(e.getMessage());
 			return;
-
-		} else {
-			timeoutString = timeoutParam.getValue().trim();
-			try {
-				timeout = Long.decode("0x" + timeoutString);
-				// if (timeout < 0 || timeout > 0xffff) {
-				if (!Util.isUnsigned32(timeout)) {
-
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
-
-				}
-			} catch (NumberFormatException nfe) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			}
 		}
-		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+
+		Parameter uriListenerParam = getParameter(Resources.URI_PARAM_URILISTENER);
 
 		try {
-			if (urilistenerParam == null) {
-				// Sync call because urilistener not present.
+			if (uriListenerParam == null) {
+				// Sync call because uriListener not present.
 
 				// Check for Gal Interface
-				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+				proxyGalInterface = getGatewayInterface();
 
 				// TODO exists also leaveSync(timeout, addrOfInterest, mask)
 				// Leave
 				Status status = proxyGalInterface.leaveSync(timeout, address, 0);
-				Info info = new Info();
-				info.setStatus(status);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.TEXT_XML);
-				return;
+
+				sendStatus(status);
 			} else {
 				// Async call
-				// We know here that urilistenerParam is not null...
-				urilistener = urilistenerParam.getValue();
-				// Process async. If urilistener equals "", don't send the
+				// We know here that uriListenerParam is not null...
+				uriListener = uriListenerParam.getValue();
+				// Process async. If uriListener equals "", don't send the
 				// result
 				// but wait that the IPHA polls for it using the request
 				// identifier. Async is possible only if start=true
 
-				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-				proxyGalInterface = rcmal.getGatewayInterface();
+				ClientResources client = getClientResources(uriListener);
+				proxyGalInterface = client.getGatewayInterface();
 
-				rcmal.getClientEventListener().setLeaveResultDestination(urilistener);
+				client.getClientEventListener().setLeaveResultDestination(uriListener);
 				proxyGalInterface.leave(timeout, address);
-				Info.Detail detail = new Info.Detail();
-				Info infoToReturn = new Info();
-				Status status = new Status();
-				status.setCode((short) GatewayConstants.SUCCESS);
-				infoToReturn.setStatus(status);
-				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+
+				sendSuccess();
 				return;
 			}
-		} catch (NullPointerException npe) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(npe.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-		} catch (Exception e1) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(e1.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+		} catch (NullPointerException e) {
+			generalError(e.getMessage());
+		} catch (Exception e) {
+			generalError(e.getMessage());
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }

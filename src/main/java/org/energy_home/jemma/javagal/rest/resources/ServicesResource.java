@@ -16,162 +16,58 @@
 package org.energy_home.jemma.javagal.rest.resources;
 
 import static org.energy_home.jemma.javagal.rest.util.Util.INTERNAL_TIMEOUT;
-import org.energy_home.jemma.zgd.GatewayConstants;
+
+import org.energy_home.jemma.javagal.rest.util.ClientResources;
+import org.energy_home.jemma.javagal.rest.util.Resources;
 import org.energy_home.jemma.zgd.GatewayInterface;
 import org.energy_home.jemma.zgd.jaxb.Address;
 import org.energy_home.jemma.zgd.jaxb.Info;
 import org.energy_home.jemma.zgd.jaxb.NodeServices;
-import org.energy_home.jemma.zgd.jaxb.Status;
-
-import java.math.BigInteger;
-
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestClientManagerAndListener;
-import org.energy_home.jemma.javagal.rest.RestManager;
-import org.energy_home.jemma.javagal.rest.util.ClientResources;
-import org.energy_home.jemma.javagal.rest.util.ResourcePathURIs;
-import org.energy_home.jemma.javagal.rest.util.Resources;
-import org.energy_home.jemma.javagal.rest.util.Util;
-import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API GET:startServiceDiscoverySync,
  * startServiceDiscovery
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class ServicesResource extends ServerResource {
+public class ServicesResource extends CommonResource {
 
 	private GatewayInterface proxyGalInterface;
-	private String timeoutString = null;
-	private Long timeout = (long) INTERNAL_TIMEOUT;
 
 	@Get
 	public void processGet() {
-		String addrString = (String) getRequest().getAttributes().get("addr");
-		Address address = new Address();
-		if (addrString.length() > 4) {
-			BigInteger addressBigInteger = BigInteger.valueOf(Long.parseLong(addrString, 16));
-			address.setIeeeAddress(addressBigInteger);
-		} else {
-			Integer addressInteger = Integer.parseInt(addrString, 16);
-			address.setNetworkAddress(addressInteger);
-		}
 
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-		if (timeoutParam != null) {
-			timeoutString = timeoutParam.getValue().trim();
-			try {
-				timeout = Long.decode(Resources.HEX_PREFIX + timeoutString);
-				// if (timeout < 0 || timeout > 0xffff) {
-				if (!Util.isUnsigned32(timeout)) {
-
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
-
-				}
-			} catch (NumberFormatException nfe) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			}
-		}
-
-		// Urilistener parameter
-		String urilistener = null;
-		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
-		// Urilistener is mandatory
-		if (urilistenerParam != null) {
-			// TODO Marco why getSecond() and not getValue()?
-			// urilistener = urilistenerParam.getSecond();
-			urilistener = urilistenerParam.getValue();
-		}
+		Address address = this.getAddressAttribute("addr");
+		long timeout = this.getLongParameter(Resources.URI_PARAM_TIMEOUT, INTERNAL_TIMEOUT);
+		String uriListener = this.getStringParameter(Resources.URI_PARAM_URILISTENER, null);
 
 		try {
-			if (urilistener == null) {
-				// Synch StartServiceDiscovery
-				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+			if (uriListener == null) {
+				proxyGalInterface = getGatewayInterface();
 				NodeServices node = proxyGalInterface.startServiceDiscoverySync(timeout, address);
 
-				Info.Detail detail = new Info.Detail();
-				detail.setNodeServices(node);
-				Info infoToReturn = new Info();
-				Status status = new Status();
-				status.setCode((short) GatewayConstants.SUCCESS);
-				infoToReturn.setStatus(status);
-				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+				Info.Detail details = new Info.Detail();
+				details.setNodeServices(node);
 
-				return;
+				sendResult(details);
 			} else {
-				// Asynch
-				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-				proxyGalInterface = rcmal.getGatewayInterface();
-				if (!urilistener.equals("")) {
-					rcmal.getClientEventListener().setNodeServicesDestination(urilistener);
+				ClientResources client = getClientResources(uriListener);
+				proxyGalInterface = client.getGatewayInterface();
+				if (!uriListener.equals("")) {
+					client.getClientEventListener().setNodeServicesDestination(uriListener);
 				}
 				proxyGalInterface.startServiceDiscovery(timeout, address);
-				Info.Detail detail = new Info.Detail();
-				Info infoToReturn = new Info();
-				Status status = new Status();
-				status.setCode((short) GatewayConstants.SUCCESS);
-				infoToReturn.setStatus(status);
-				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-				return;
+				sendSuccess();
 			}
-
-		} catch (NullPointerException npe) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(npe.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-
+		} catch (NullPointerException e) {
+			generalError(e.getMessage());
 		} catch (Exception e) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(e.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+			generalError(e.getMessage());
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }

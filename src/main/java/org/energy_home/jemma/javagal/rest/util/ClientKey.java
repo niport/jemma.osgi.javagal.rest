@@ -18,8 +18,10 @@ package org.energy_home.jemma.javagal.rest.util;
 /**
  * Client identification key parameters.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class ClientKey {
@@ -40,7 +42,7 @@ public class ClientKey {
 	 * Sets the client's address.
 	 * 
 	 * @param address
-	 *            the client's address to set.
+	 *          the client's address to set.
 	 */
 	public void setAddress(String address) {
 		this.address = address;
@@ -59,7 +61,7 @@ public class ClientKey {
 	 * Sets the client's port.
 	 * 
 	 * @param port
-	 *            the client's port to set.
+	 *          the client's port to set.
 	 */
 	public void setPort(int port) {
 		this.port = port;

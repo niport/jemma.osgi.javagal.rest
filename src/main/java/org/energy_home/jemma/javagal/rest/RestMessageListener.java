@@ -38,12 +38,14 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@code APSMessageListener} interface for the Rest server.
  * <p>
  * Rest clients interested to listen to Aps messages, resister themselves
- * indicating an uri, here called urilistener, where they are listening for
+ * indicating an uri, here called uriListener, where they are listening for
  * incoming notifications. In practice the clients opens an http server at the
- * urilistener uri where this class can {@code POST} incoming notifications.
+ * uriListener uri where this class can {@code POST} incoming notifications.
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
 public class RestMessageListener implements MessageListener {
@@ -51,32 +53,32 @@ public class RestMessageListener implements MessageListener {
 	private static final Logger LOG = LoggerFactory.getLogger(RestMessageListener.class);
 	private Long CalbackIdentifier = -1L;
 	private Callback callback;
-	private String urilistener;
+	private String uriListener;
 	private ClientResources clientResource;
 	private final Context context;
 	private PropertiesManager _PropertiesManager;
 
 	/**
-	 * Creates a new instance with a given callback, urilistener and client
+	 * Creates a new instance with a given callback, uriListener and client
 	 * resource.
 	 * <p>
 	 * Rest clients interested to listen to Aps messages, resister themselves
-	 * indicating an uri, here called urilistener, where they are listening for
-	 * incoming notifications. In practice the clients opens an http server at
-	 * the urilistener uri where this class can {@code POST} incoming
-	 * notifications.
+	 * indicating an uri, here called uriListener, where they are listening for
+	 * incoming notifications. In practice the clients opens an http server at the
+	 * uriListener uri where this class can {@code POST} incoming notifications.
 	 * 
 	 * @param callback
-	 *            the callback.
-	 * @param urilistener
-	 *            the urilistener.
+	 *          the callback.
+	 * @param uriListener
+	 *          the uriListener.
 	 * @param _clientResource
-	 *            the client resource.
+	 *          the client resource.
 	 */
-	public RestMessageListener(Callback callback, String urilistener, ClientResources _clientResource, PropertiesManager __PropertiesManager) {
+	public RestMessageListener(Callback callback, String uriListener, ClientResources _clientResource,
+			PropertiesManager __PropertiesManager) {
 		super();
 		this.callback = callback;
-		this.urilistener = urilistener;
+		this.uriListener = uriListener;
 		this.clientResource = _clientResource;
 		this.context = new Context();
 		this._PropertiesManager = __PropertiesManager;
@@ -99,12 +101,12 @@ public class RestMessageListener implements MessageListener {
 	 */
 	synchronized public void notifyAPSMessage(final APSMessageEvent message) {
 
-		if (urilistener != null) {
+		if (uriListener != null) {
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 
-						ClientResource resource = new ClientResource(context, urilistener);
+						ClientResource resource = new ClientResource(context, uriListener);
 						Info info = new Info();
 						Info.Detail detail = new Info.Detail();
 						detail.setAPSMessageEvent(message);
@@ -129,12 +131,12 @@ public class RestMessageListener implements MessageListener {
 	}
 
 	/**
-	 * Gets the urilistener.
+	 * Gets the uriListener.
 	 * 
-	 * @return the urilistener.
+	 * @return the uriListener.
 	 */
 	public String getUrilistener() {
-		return urilistener;
+		return uriListener;
 	}
 
 	/**
@@ -150,7 +152,7 @@ public class RestMessageListener implements MessageListener {
 	 * Sets the callback id.
 	 * 
 	 * @param id
-	 *            the callback id to set.
+	 *          the callback id to set.
 	 */
 	public void setCallBackId(Long id) {
 
@@ -160,12 +162,12 @@ public class RestMessageListener implements MessageListener {
 
 	@Override
 	public void notifyInterPANMessage(final InterPANMessageEvent message) {
-		if (urilistener != null) {
+		if (uriListener != null) {
 			executor.execute(new Runnable() {
 				public void run() {
 					try {
 
-						ClientResource resource = new ClientResource(context, urilistener);
+						ClientResource resource = new ClientResource(context, uriListener);
 						Info info = new Info();
 						Info.Detail detail = new Info.Detail();
 						detail.setInterPANMessageEvent(message);

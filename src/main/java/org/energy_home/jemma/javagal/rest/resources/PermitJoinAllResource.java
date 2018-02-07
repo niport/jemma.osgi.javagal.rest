@@ -15,136 +15,58 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestManager;
 import org.energy_home.jemma.javagal.rest.util.ClientResources;
 import org.energy_home.jemma.javagal.rest.util.Resources;
 import org.energy_home.jemma.javagal.rest.util.Util;
-import org.energy_home.jemma.zgd.GatewayConstants;
 import org.energy_home.jemma.zgd.GatewayInterface;
 import org.energy_home.jemma.zgd.jaxb.Info;
 import org.energy_home.jemma.zgd.jaxb.JoiningInfo;
-import org.energy_home.jemma.zgd.jaxb.Status;
-import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
 import org.restlet.resource.Post;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API POST:permitJoinAll
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class PermitJoinAllResource extends ServerResource {
+public class PermitJoinAllResource extends CommonResource {
 
-	private GatewayInterface proxyGalInterface;
+	private GatewayInterface gatewayInterface;
 
 	@Post
 	public void processPost(String body) {
 
-		// Uri parameters check
-		String timeoutString = null;
-		String urilistener = null;
-		Long timeout = -1l;
-
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-		if (timeoutParam == null) {
-
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter missing.");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-
-		} else {
-			timeoutString = timeoutParam.getValue().trim();
-			try {
-				timeout = Long.decode("0x" + timeoutString);
-			} catch (NumberFormatException nfe) {
-			}
-			// if (timeout < 0 || timeout > 0xffffffff) {
-			if (!Util.isUnsigned32(timeout)) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			}
-		}
-
-		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
+		long timeout = getLongParameter(Resources.URI_PARAM_TIMEOUT, -1);
+		String uriListener = this.getStringParameter(Resources.URI_PARAM_URILISTENER, null);
 
 		JoiningInfo joiningInfo;
 		try {
 			joiningInfo = Util.unmarshal(body, JoiningInfo.class);
-			// Gal Manager check
 
-			if (urilistenerParam == null) {
-				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+			if (uriListener == null) {
+				gatewayInterface = getGatewayInterface();
+				gatewayInterface.permitJoinAll(timeout, joiningInfo.getPermitDuration());
 
-				proxyGalInterface.permitJoinAll(timeout, joiningInfo.getPermitDuration());
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.SUCCESS);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
+				Info.Detail details = new Info.Detail();
+				sendResult(details);
 			} else {
-				// Async call. We know here that urilistenerParam is not null...
-				urilistener = urilistenerParam.getValue();
-				// Process async. If urilistener equals "", don't send the
+				// Async call. We know here that uriListenerParam is not null...
+				// Process async. If uriListener equals "", don't send the
 				// result but wait that the IPHA polls for it using the request
 				// identifier.
-				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-				proxyGalInterface = rcmal.getGatewayInterface();
+				ClientResources client = getClientResources(uriListener);
 
-				rcmal.getClientEventListener().setPermitJoinDestination(urilistener);
+				gatewayInterface = client.getGatewayInterface();
+				client.getClientEventListener().setPermitJoinDestination(uriListener);
+				gatewayInterface.permitJoinAll(timeout, joiningInfo.getPermitDuration());
 
-				proxyGalInterface.permitJoinAll(timeout, joiningInfo.getPermitDuration());
-
-				Info.Detail detail = new Info.Detail();
-				Info infoToReturn = new Info();
-				Status status = new Status();
-				status.setCode((short) GatewayConstants.SUCCESS);
-				infoToReturn.setStatus(status);
-				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-				return;
+				sendSuccess();
 			}
-		} catch (Exception e1) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(e1.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+		} catch (Exception e) {
+			generalError(e.getMessage());
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }

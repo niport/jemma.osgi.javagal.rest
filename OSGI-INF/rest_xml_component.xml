@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This file is part of JEMMA - http://jemma.energy-home.org
+    (C) Copyright 2013 Telecom Italia (http://www.telecomitalia.it)
+
+    JEMMA is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License (LGPL) version 3
+    or later as published by the Free Software Foundation, which accompanies
+    this distribution and is available at http://www.gnu.org/licenses/lgpl.html
+
+    JEMMA is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License (LGPL) for more details.
+-->
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" activate="activate" deactivate="deactivate" enabled="true" name="ComponentFactory">
+   <implementation class="org.energy_home.jemma.javagal.rest.RestXmlComponent"/>
+   <reference bind="bindComponentFactory" cardinality="0..n" interface="org.osgi.service.component.ComponentFactory" name="ComponentFactory" policy="dynamic" target="(component.factory=javagal.factory)" unbind="unbindComponentFactory"/>
+</scr:component>

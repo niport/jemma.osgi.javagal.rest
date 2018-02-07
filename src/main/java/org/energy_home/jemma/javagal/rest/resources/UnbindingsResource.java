@@ -15,196 +15,67 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import java.math.BigInteger;
-
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestManager;
 import org.energy_home.jemma.javagal.rest.util.ClientResources;
-import org.energy_home.jemma.javagal.rest.util.ResourcePathURIs;
 import org.energy_home.jemma.javagal.rest.util.Resources;
 import org.energy_home.jemma.javagal.rest.util.Util;
-import org.energy_home.jemma.zgd.GatewayConstants;
 import org.energy_home.jemma.zgd.GatewayInterface;
 import org.energy_home.jemma.zgd.jaxb.Address;
 import org.energy_home.jemma.zgd.jaxb.Binding;
-import org.energy_home.jemma.zgd.jaxb.Info;
 import org.energy_home.jemma.zgd.jaxb.Status;
-import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
 import org.restlet.resource.Post;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API POST:removeBindingSync, removeBinding
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class UnbindingsResource extends ServerResource {
+public class UnbindingsResource extends CommonResource {
 	private GatewayInterface proxyGalInterface;
 
 	@Post
 	public void processPost(String body) {
 
-		String urilistener;
-
 		Binding binding = null;
 		try {
 			binding = Util.unmarshal(body, Binding.class);
-		} catch (Exception jbe) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("Malformed Binding in request");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+		} catch (Exception e) {
+			generalError("Malformed Binding in request");
 			return;
-
 		}
+
 		if ((binding.getDeviceDestination() == null) || binding.getDeviceDestination().size() != 1) {
-
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("DeviceDestination must contain exactly one element.");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+			generalError("DeviceDestination must contain exactly one element.");
 			return;
-
 		}
+
+		long timeout = getLongParameter(Resources.URI_PARAM_TIMEOUT, -1);
+		Address address = this.getAddressAttribute("addr");
+		String uriListener = this.getStringParameter(Resources.URI_PARAM_URILISTENER, null);
 
 		try {
-			Address _add = new Address();
-			// addrString parameters check
-			String addrString = (String) getRequest().getAttributes().get(Resources.PARAMETER_ADDR);
-			if (addrString != null) {
-				if (addrString.length() > 4) {
-					// IEEEAddress
-					BigInteger iee = new BigInteger(addrString, 16);
-					_add.setIeeeAddress(iee);
-				} else {
-					// ShortAddress
-					Integer _sa = new Integer(Integer.parseInt(addrString, 16));
-					_add.setNetworkAddress(_sa);
-				}
-			} else {
 
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + Resources.URI_ADDR + "' parameter's value invalid. You provided: " + addrString);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			}
-
-			String timeoutString = null;
-			Long timeout = -1L;
-			Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-			if (timeoutParam != null) {
-				timeoutString = timeoutParam.getValue();
-				try {
-					timeout = Long.decode(Resources.HEX_PREFIX + timeoutString);
-					if (!Util.isUnsigned32(timeout)) {
-
-						Info info = new Info();
-						Status _st = new Status();
-						_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-						_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
-						info.setStatus(_st);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-						return;
-
-					}
-				} catch (NumberFormatException nfe) {
-
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: optional '" + ResourcePathURIs.TIMEOUT_PARAM + "' parameter's value invalid. You provided: " + timeoutString);
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
-
-				}
-			}
-
-			Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
-
-			if (urilistenerParam == null) {
-				// Sync call because urilistener not present.
-				// Gal Manager check
-				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+			if (uriListener == null) {
+				proxyGalInterface = getGatewayInterface();
 				Status status = proxyGalInterface.removeBindingSync(timeout, binding);
-				Info info = new Info();
-				info.setStatus(status);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.TEXT_XML);
-				return;
+
+				sendStatus(status);
 			} else {
-				// Async call. We know here that urilistenerParam is not null...
-				urilistener = urilistenerParam.getValue();
-				// Process async. If urilistener equals "", don't send the
-				// result but wait that the IPHA polls for it using the request
-				// identifier.
+				ClientResources client = getClientResources(uriListener);
 
-				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-				proxyGalInterface = rcmal.getGatewayInterface();
-				rcmal.getClientEventListener().setUnbindingDestination(urilistener);
+				proxyGalInterface = client.getGatewayInterface();
+
+				client.getClientEventListener().setUnbindingDestination(uriListener);
 				proxyGalInterface.removeBinding(timeout, binding);
-
-				Info.Detail detail = new Info.Detail();
-				Info infoToReturn = new Info();
-				Status status = new Status();
-				status.setCode((short) GatewayConstants.SUCCESS);
-				infoToReturn.setStatus(status);
-				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-				return;
+				sendSuccess();
 			}
-		} catch (NullPointerException npe) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(npe.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+		} catch (NullPointerException e) {
+			generalError(e.getMessage());
 		} catch (Exception e) {
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage(e.getMessage());
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
+			generalError(e.getMessage());
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }

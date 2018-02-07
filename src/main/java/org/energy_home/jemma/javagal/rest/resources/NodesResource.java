@@ -15,203 +15,90 @@
  */
 package org.energy_home.jemma.javagal.rest.resources;
 
-import org.energy_home.jemma.zgd.GatewayConstants;
-import org.energy_home.jemma.zgd.GatewayInterface;
-import org.energy_home.jemma.zgd.jaxb.Info;
-import org.energy_home.jemma.zgd.jaxb.Status;
-import org.energy_home.jemma.zgd.jaxb.WSNNodeList;
-import org.energy_home.jemma.zgd.jaxb.Info.Detail;
+import static org.energy_home.jemma.javagal.rest.util.Util.INTERNAL_TIMEOUT;
 
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestClientManagerAndListener;
-import org.energy_home.jemma.javagal.rest.RestManager;
 import org.energy_home.jemma.javagal.rest.util.ClientResources;
 import org.energy_home.jemma.javagal.rest.util.ResourcePathURIs;
 import org.energy_home.jemma.javagal.rest.util.Resources;
-import org.energy_home.jemma.javagal.rest.util.Util;
-import org.restlet.data.MediaType;
+import org.energy_home.jemma.zgd.GatewayConstants;
+import org.energy_home.jemma.zgd.GatewayInterface;
+import org.energy_home.jemma.zgd.jaxb.Info;
+import org.energy_home.jemma.zgd.jaxb.WSNNodeList;
 import org.restlet.data.Parameter;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API GET:readNodeCache, subscribeNodeRemoval,
  * startNodeDiscovery.
- * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
- * 
+ *
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
+ *
  */
-public class NodesResource extends ServerResource {
-	private GatewayInterface proxyGalInterface = null;
+public class NodesResource extends CommonResource {
+	private GatewayInterface gatewayInterface = null;
 
 	@Get
 	public void processGet() throws ResourceException {
 		// Uri parameters check
 		String modeString = null;
 
-		Parameter modeParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_MODE);
+		Parameter modeParam = getParameter(Resources.URI_PARAM_MODE);
 		if (modeParam != null) {
 			modeString = modeParam.getValue();
 		}
+
 		if (modeString != null) {
 			// Mode parameter is present, it's a Read Node Cache
 			// Control mode parameter's validity
 			if (!modeString.equals(Resources.URI_PARAM_CACHE)) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: optional '" + Resources.URI_PARAM_MODE + "' parameter's value invalid. You provided: " + modeString);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				generalError("Error: optional '" + Resources.URI_PARAM_MODE + "' parameter's value invalid. You provided: " + modeString);
 				return;
-
 			}
 
 			try {
-				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+				gatewayInterface = getGatewayInterface();
 				// ReadNodeCache
-				WSNNodeList _cache = proxyGalInterface.readNodeCache();
+				WSNNodeList _cache = gatewayInterface.readNodeCache();
+				Info.Detail details = new Info.Detail();
+				details.setWSNNodes(_cache);
 
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.SUCCESS);
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				detail.setWSNNodes(_cache);
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				sendResult(details);
 				return;
 
-			} catch (NullPointerException npe) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(npe.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+			} catch (NullPointerException e) {
+				generalError(e.getMessage());
 				return;
 			} catch (Exception e) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(e.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				generalError(e.getMessage());
 				return;
 			}
-
 		} else {
-			// Mode parameter not present, it's a
-			// StartNodeDiscovery
-			// or a
-			// SubscribeNodeRemoval
-			String timeoutString = null;
-			String urilistener = null;
-			Long timeout = -1l;
+			/*
+			 * Mode parameter not present, it's a StartNodeDiscovery or a
+			 * SubscribeNodeRemoval
+			 */
 
-			// Timeout Parameter
-			Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-			if (timeoutParam == null) {
-				Detail _det = new Detail();
-				Info _info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.SUCCESS);
-				_info.setStatus(_st);
-				_det.getValue().add(Resources.URI_ADDR);
-				_info.setDetail(_det);
-				getResponse().setEntity(Util.marshal(_info), MediaType.APPLICATION_XML);
-				return;
-
-			} else {
-				timeoutString = timeoutParam.getValue().trim();
-				try {
-					timeout = Long.decode("0x" + timeoutString);
-					// if (timeout < 0 || timeout > 0xffff) {
-					if (!Util.isUnsigned32(timeout)) {
-
-						Info info = new Info();
-						Status _st = new Status();
-						_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-						_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-						info.setStatus(_st);
-						Info.Detail detail = new Info.Detail();
-						info.setDetail(detail);
-						getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-						return;
-
-					}
-				} catch (NumberFormatException nfe) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage("Error: mandatory '" + Resources.URI_PARAM_TIMEOUT + "' parameter's value invalid. You provided: " + timeoutString);
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
-
-				}
-			}
-
-			// Urilistener parameter
-			Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
-
-			// Urilistener is mandatory
-			if (urilistenerParam == null) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: mandatory '" + ResourcePathURIs.URILISTENER_PARAM + "' parameter's is not present.");
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			} else {
-				urilistener = urilistenerParam.getValue();
-			}
+			long timeout = this.getLongParameter(Resources.URI_PARAM_TIMEOUT, INTERNAL_TIMEOUT);
+			String uriListener = this.getStringParameter(Resources.URI_PARAM_URILISTENER);
 
 			// ReportOnExistingNodes parameter
-			Parameter reportOnExistingNodesParam = getRequest().getResourceRef().getQueryAsForm().getFirst(ResourcePathURIs.DISCOVERY_INQUIRY);
+			Parameter reportOnExistingNodesParam = getParameter(ResourcePathURIs.DISCOVERY_INQUIRY);
 
 			// ReportOnExistingNodes is no longer implemented
 			if (reportOnExistingNodesParam != null) {
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: optional '" + ResourcePathURIs.DISCOVERY_INQUIRY + "' parameter's is no longer implemented.");
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				generalError("Error: optional '" + ResourcePathURIs.DISCOVERY_INQUIRY + "' parameter's is no longer implemented.");
 				return;
-
 			}
 
-			// ReportAnnouncements parameter
-			Parameter reportAnnouncementsParam = getRequest().getResourceRef().getQueryAsForm().getFirst(ResourcePathURIs.DISCOVERY_ANNOUNCEMENTS);
-
-			// Lqi parameter
-			Parameter lqiParam = getRequest().getResourceRef().getQueryAsForm().getFirst(ResourcePathURIs.DISCOVERY_LQI);
-
-			// ReportLeave parameter
-			Parameter reportLeaveParam = getRequest().getResourceRef().getQueryAsForm().getFirst(ResourcePathURIs.DISCOVERY_LEAVE);
-
-			// Freshness parameter
-			Parameter freshnessParam = getRequest().getResourceRef().getQueryAsForm().getFirst(ResourcePathURIs.DISCOVERY_FRESHNESS);
+			/* TODO: not clear which have to be the type of these parameters */
+			Parameter reportAnnouncementsParam = getParameter(ResourcePathURIs.DISCOVERY_ANNOUNCEMENTS);
+			Parameter lqiParam = getParameter(ResourcePathURIs.DISCOVERY_LQI);
+			Parameter reportLeaveParam = getParameter(ResourcePathURIs.DISCOVERY_LEAVE);
+			Parameter freshnessParam = getParameter(ResourcePathURIs.DISCOVERY_FRESHNESS);
 
 			// Calculating the discovery mask
 			int discoveryMask = -1;
@@ -221,6 +108,7 @@ public class NodesResource extends ServerResource {
 				}
 				discoveryMask = discoveryMask | GatewayConstants.DISCOVERY_ANNOUNCEMENTS;
 			}
+
 			if (lqiParam != null) {
 				if (discoveryMask == -1) {
 					discoveryMask = 0;
@@ -245,154 +133,71 @@ public class NodesResource extends ServerResource {
 
 			// Control if it's a Start Node Discovery or a SubscribeNodeRemoval
 			// or a "Stop" request
-			if ((discoveryMask == -1) && (freshnessMask == -1)) {
+			if (discoveryMask == -1 && freshnessMask == -1) {
 				// It's a "Stop" request
 				try {
-					proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
+					gatewayInterface = getGatewayInterface();
 
-					if (urilistener.toLowerCase().contains("nodediscovered"))
-						proxyGalInterface.startNodeDiscovery(timeout, 0);
-					if (urilistener.toLowerCase().contains("noderemoved"))
-						proxyGalInterface.subscribeNodeRemoval(timeout, 0);
-					Info.Detail detail = new Info.Detail();
-					Info infoToReturn = new Info();
-					Status status = new Status();
-					status.setCode((short) GatewayConstants.SUCCESS);
-					infoToReturn.setStatus(status);
-					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
+					if (uriListener.toLowerCase().contains("nodediscovered"))
+						gatewayInterface.startNodeDiscovery(timeout, 0);
+					if (uriListener.toLowerCase().contains("noderemoved"))
+						gatewayInterface.subscribeNodeRemoval(timeout, 0);
+
+					sendSuccess();
+
 					return;
-				} catch (NullPointerException npe) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage(npe.getMessage());
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				} catch (NullPointerException e) {
+					generalError(e.getMessage());
 					return;
 				} catch (Exception e) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage(e.getMessage());
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+					generalError(e.getMessage());
 					return;
 				}
-			} else if ((discoveryMask != -1) && (freshnessMask != -1)) {
-				// Error: you cannot ask for both a Start Node Discovery and
-				// SubscribeNodeRemoval in the same request
-
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Error: you cannot ask for both a Start Node Discovery and SubscribeNodeRemoval in the same request");
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			} else if ((discoveryMask != -1) && (freshnessMask == -1)) {
+			} else if (discoveryMask != -1 && freshnessMask != -1) {
+				/*
+				 * Error: you cannot ask for both a Start Node Discovery and
+				 * SubscribeNodeRemoval in the same request
+				 */
+				generalError("Error: you cannot ask for both a Start Node Discovery and SubscribeNodeRemoval in the same request");
+			} else if (discoveryMask != -1 && freshnessMask == -1) {
 				// It's a StartNodeDiscovery
 				try {
 					// Obtaining the listener
-					ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-					proxyGalInterface = rcmal.getGatewayInterface();
-					// Setting the urlilistener to the listener
-					rcmal.getClientEventListener().setNodeDiscoveredDestination(urilistener);
+					ClientResources client = getClientResources(uriListener);
 
-					// StartNodeDiscovery
-					proxyGalInterface.startNodeDiscovery(timeout, discoveryMask);
-					Info.Detail detail = new Info.Detail();
-					Info infoToReturn = new Info();
-					Status status = new Status();
-					status.setCode((short) GatewayConstants.SUCCESS);
-					infoToReturn.setStatus(status);
-					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-					return;
-				} catch (NullPointerException npe) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage(npe.getMessage());
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
+					gatewayInterface = client.getGatewayInterface();
 
+					client.getClientEventListener().setNodeDiscoveredDestination(uriListener);
+
+					gatewayInterface.startNodeDiscovery(timeout, discoveryMask);
+
+					sendSuccess();
+				} catch (NullPointerException e) {
+					generalError(e.getMessage());
 				} catch (Exception e) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage(e.getMessage());
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
+					generalError(e.getMessage());
 				}
-			} else if ((discoveryMask == -1) && (freshnessMask != -1)) {
+			} else if (discoveryMask == -1 && freshnessMask != -1) {
 
 				// It's a SubscribeNodeRemoval
 				try {
 					// Obtaining the listener
-					ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-					proxyGalInterface = rcmal.getGatewayInterface();
+					ClientResources client = getClientResources(uriListener);
+
+					gatewayInterface = client.getGatewayInterface();
 					// Setting the urlilistener to the listener
-					rcmal.getClientEventListener().setNodeRemovedDestination(urilistener);
+					client.getClientEventListener().setNodeRemovedDestination(uriListener);
 
 					// SubscribeNodeRemoval
-					proxyGalInterface.subscribeNodeRemoval(timeout, freshnessMask);
-					Info.Detail detail = new Info.Detail();
-					Info infoToReturn = new Info();
-					Status status = new Status();
-					status.setCode((short) GatewayConstants.SUCCESS);
-					infoToReturn.setStatus(status);
-					infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-					infoToReturn.setDetail(detail);
-					getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-					return;
+					gatewayInterface.subscribeNodeRemoval(timeout, freshnessMask);
 
-				} catch (NullPointerException npe) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage(npe.getMessage());
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
+					sendSuccess();
+				} catch (NullPointerException e) {
+					generalError(e.getMessage());
 				} catch (Exception e) {
-					Info info = new Info();
-					Status _st = new Status();
-					_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-					_st.setMessage(e.getMessage());
-					info.setStatus(_st);
-					Info.Detail detail = new Info.Detail();
-					info.setDetail(detail);
-					getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-					return;
+					generalError(e.getMessage());
 				}
 			}
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }

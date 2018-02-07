@@ -16,173 +16,57 @@
 package org.energy_home.jemma.javagal.rest.resources;
 
 import static org.energy_home.jemma.javagal.rest.util.Util.INTERNAL_TIMEOUT;
-import org.energy_home.jemma.zgd.GatewayConstants;
-import org.energy_home.jemma.zgd.GatewayInterface;
-import org.energy_home.jemma.zgd.jaxb.Info;
-import org.energy_home.jemma.zgd.jaxb.Status;
 
-import org.energy_home.jemma.javagal.rest.GalManagerRestApplication;
-import org.energy_home.jemma.javagal.rest.RestClientManagerAndListener;
-import org.energy_home.jemma.javagal.rest.RestManager;
 import org.energy_home.jemma.javagal.rest.util.ClientResources;
 import org.energy_home.jemma.javagal.rest.util.Resources;
-import org.energy_home.jemma.javagal.rest.util.Util;
-import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
+import org.energy_home.jemma.zgd.GatewayInterface;
+import org.energy_home.jemma.zgd.jaxb.Status;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
 /**
  * Resource file used to manage the API GET:resetDongleSync, resetDongle
  * 
- * @author 
- *         "Ing. Marco Nieddu <marco.nieddu@consoft.it> or <marco.niedducv@gmail.com> from Consoft Sistemi S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity SecSES - Secure Energy Systems (activity id 13030)"
+ * @author "Ing. Marco Nieddu <marco.nieddu@consoft.it> or
+ *         <marco.niedducv@gmail.com> from Consoft Sistemi
+ *         S.P.A.<http://www.consoft.it>, financed by EIT ICT Labs activity
+ *         SecSES - Secure Energy Systems (activity id 13030)"
  * 
  */
-public class ResetResource extends ServerResource {
+public class ResetResource extends CommonResource {
 
 	private GatewayInterface proxyGalInterface;
 
 	@Get
 	public void resetMethod(String body) {
 
-		String urilistener = null;
-		String timeoutString = null;
-		Long timeout = -1l;
-		short warmStartValue = 0x00;
+		String uriListener = getStringParameter(Resources.URI_PARAM_URILISTENER, null);
+		long timeout = getLongParameter(Resources.URI_PARAM_TIMEOUT, INTERNAL_TIMEOUT);
+		long warmStart = getLongParameter(Resources.URI_PARAM_START_MODE_RESET);
 
-		Parameter urilistenerParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_URILISTENER);
-		if (urilistenerParam != null) {
-			urilistener = urilistenerParam.getValue().trim();
-		}
-		Parameter timeoutParam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_TIMEOUT);
-		if (timeoutParam != null) {
-			timeoutString = timeoutParam.getValue().trim();
+		if (uriListener == null) {
 			try {
-				timeout = Long.decode("0x" + timeoutString);
-			} catch (NumberFormatException nfe) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(nfe.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
+				proxyGalInterface = getGatewayInterface();
 
-			}
-			if (!Util.isUnsigned32(timeout)) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("Wrong timeout");
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-			}
-		} else {
-			// The timeout parameter is optional. If not provided we use a
-			// default.
-			timeout = (long) INTERNAL_TIMEOUT;
-		}
+				Status result = proxyGalInterface.resetDongleSync(timeout, (short) warmStart);
 
-		// TODO Set the right warm start value.
-		String warmparamString = null;
-
-		Parameter warmparam = getRequest().getResourceRef().getQueryAsForm().getFirst(Resources.URI_PARAM_START_MODE_RESET);
-		if (warmparam != null) {
-			warmparamString = warmparam.getValue().trim();
-			try {
-				warmStartValue = Short.decode(warmparamString);
-			} catch (NumberFormatException nfe) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(nfe.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
-
-			}
-
-		} else {
-			// The warm start value is mandatory!!
-			Info info = new Info();
-			Status _st = new Status();
-			_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-			_st.setMessage("The warm start value is mandatory");
-			info.setStatus(_st);
-			Info.Detail detail = new Info.Detail();
-			info.setDetail(detail);
-			getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-			return;
-
-		}
-
-		if (urilistenerParam == null) {
-			// Sync reset
-			try {
-				proxyGalInterface = getRestManager().getClientObjectKey(-1, getClientInfo().getAddress()).getGatewayInterface();
-
-				Status result = proxyGalInterface.resetDongleSync(timeout, warmStartValue);
-				Info info = new Info();
-				info.setStatus(result);
-				getResponse().setEntity(Util.marshal(info), MediaType.TEXT_XML);
-
+				sendStatus(result);
 			} catch (Exception e) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage(e.getMessage());
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
+				generalError(e.getMessage());
 				return;
 			}
 		} else {
-			// Async reset
 			try {
-				ClientResources rcmal = getRestManager().getClientObjectKey(Util.getPortFromUriListener(urilistener), getClientInfo().getAddress());
-				proxyGalInterface = rcmal.getGatewayInterface();
-				if (!urilistener.equals("")) {
-					rcmal.getClientEventListener().setResetDestination(urilistener);
+				ClientResources client = getClientResources(uriListener);
+				proxyGalInterface = client.getGatewayInterface();
+				if (!uriListener.equals("")) {
+					client.getClientEventListener().setResetDestination(uriListener);
 				}
-				proxyGalInterface.resetDongle(timeout, warmStartValue);
-				Info.Detail detail = new Info.Detail();
-				Info infoToReturn = new Info();
-				Status status = new Status();
-				status.setCode((short) GatewayConstants.SUCCESS);
-				infoToReturn.setStatus(status);
-				infoToReturn.setRequestIdentifier(Util.getRequestIdentifier());
-				infoToReturn.setDetail(detail);
-				getResponse().setEntity(Util.marshal(infoToReturn), MediaType.TEXT_XML);
-				return;
+				proxyGalInterface.resetDongle(timeout, (short) warmStart);
+
+				sendSuccess();
 			} catch (Exception e) {
-				Info info = new Info();
-				Status _st = new Status();
-				_st.setCode((short) GatewayConstants.GENERAL_ERROR);
-				_st.setMessage("The warm start value is mandatory");
-				info.setStatus(_st);
-				Info.Detail detail = new Info.Detail();
-				info.setDetail(detail);
-				getResponse().setEntity(Util.marshal(info), MediaType.APPLICATION_XML);
-				return;
+				generalError("The warm start value is mandatory");
 			}
 		}
-	}
-
-	/**
-	 * Gets the RestManager.
-	 * 
-	 * @return the RestManager.
-	 */
-	private RestManager getRestManager() {
-		return ((GalManagerRestApplication) getApplication()).getRestManager();
 	}
 }
