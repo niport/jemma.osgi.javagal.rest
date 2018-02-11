@@ -82,6 +82,7 @@
 							javax.xml.namespace,
 							javax.xml.transform.stream,
 							org.restlet,
+							org.restlet.service,
 							org.restlet.data,
 							org.restlet.representation,
 							org.restlet.engine.header,
