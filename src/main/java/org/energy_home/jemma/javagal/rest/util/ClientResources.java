@@ -85,8 +85,7 @@ public class ClientResources {
 				restManager.removeClientObjectKey(clientKey);
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Exception", e);
 			}
 		}
 
