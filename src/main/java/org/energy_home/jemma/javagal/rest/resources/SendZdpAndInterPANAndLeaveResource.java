@@ -53,7 +53,7 @@ public class SendZdpAndInterPANAndLeaveResource extends CommonResource {
 	public void doOptions() {
 		Series<Header> responseHeaders = (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
 		if (responseHeaders == null) {
-			responseHeaders = new Series(Header.class);
+			responseHeaders = new Series<Header>(Header.class);
 			getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
 		}
 		responseHeaders.add("Access-Control-Allow-Origin", "*");
@@ -84,7 +84,7 @@ public class SendZdpAndInterPANAndLeaveResource extends CommonResource {
 
 		Series<Header> responseHeaders = (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
 		if (responseHeaders == null) {
-			responseHeaders = new Series(Header.class);
+			responseHeaders = new Series<Header>(Header.class);
 			getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
 		}
 		// allow request from other origins
@@ -111,7 +111,6 @@ public class SendZdpAndInterPANAndLeaveResource extends CommonResource {
 			try {
 				if (uriListener == null) {
 					generalError("Sync call because uriListener not present. Not implemented. Only asynch is admitted");
-					return;
 				} else {
 					ClientResources client = getClientResources(uriListener);
 
@@ -121,11 +120,9 @@ public class SendZdpAndInterPANAndLeaveResource extends CommonResource {
 					proxyGalInterface.sendInterPANMessage(timeout, interPANMessage);
 
 					sendSuccess();
-					return;
 				}
 			} catch (Exception e) {
 				generalError(e.getMessage());
-				return;
 			}
 		} else if (zdpCommand != null) {
 

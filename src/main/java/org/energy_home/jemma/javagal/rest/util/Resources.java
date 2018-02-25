@@ -43,7 +43,7 @@ public class Resources {
 	/*
 	 * Parameter names
 	 */
-	public final static String URI_PARAM_URILISTENER = "uriListener";
+	public final static String URI_PARAM_URILISTENER = "urilistener";
 	public final static String URI_PARAM_TIMEOUT = "timeout";
 	public final static String URI_PARAM_START = "start";
 	public final static String URI_PARAM_INDEX = "index";
